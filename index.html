@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UML 2.5 Mini-kurz | Návrhový diagram tříd</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Horní lišta -->
+    <header class="topbar">
+      <div class="topbar-brand">
+        <span class="brand-emblem" aria-hidden="true">◇</span>
+        <div>
+          <h1 class="brand-title">UML 2.5 Mini-kurz</h1>
+          <span class="brand-subtitle">Cech návrhových diagramů tříd</span>
+        </div>
+      </div>
+
+      <div class="topbar-status">
+        <div class="gamification-panel" title="Úroveň a hodnost učedníka">
+          <div class="level-badge">
+            <span class="level-label">Úroveň <strong id="ui-level">0</strong></span>
+            <span class="rank-name" id="ui-rank">Nováček v cechu</span>
+          </div>
+          <div class="xp-bar-wrapper">
+            <div class="xp-bar-track">
+              <div class="xp-bar-fill" id="ui-xp-fill" style="width: 0%;"></div>
+            </div>
+            <span class="xp-text" id="ui-xp-text">0 / 100 XP</span>
+          </div>
+        </div>
+
+        <div class="mode-switch" role="group" aria-label="Režim progrese">
+          <span class="mode-label">Režim:</span>
+          <button type="button" id="btn-mode-toggle" class="btn btn-sm btn-outline" title="Přepnout mezi Řízenou cestou a Volným průchodem">
+            Řízená cesta
+          </button>
+        </div>
+
+        <div class="topbar-actions">
+          <button type="button" id="btn-open-badges" class="btn btn-sm btn-secondary">
+            Odznaky (<span id="ui-badge-count">0 / 4</span>)
+          </button>
+          <button type="button" id="btn-open-cert" class="btn btn-sm btn-primary">
+            Certifikát a záloha
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hlavní tělo aplikace -->
+    <div class="app-body">
+      <!-- Levý navigační strom -->
+      <aside class="sidebar" aria-label="Navigace kapitolami">
+        <div class="sidebar-header">
+          <h2>Osnova kurzu</h2>
+          <div class="course-progress-pill">
+            Dokončeno: <strong id="ui-completed-count">0 / 19</strong>
+          </div>
+        </div>
+        <nav id="nav-tree" class="nav-tree"></nav>
+      </aside>
+
+      <!-- Pracovní plocha -->
+      <main class="workspace" id="workspace">
+        <!-- Hlavička podkapitoly -->
+        <section class="subchapter-header">
+          <div class="breadcrumb" id="ui-breadcrumb">Teoretická část</div>
+          <div class="subchapter-title-row">
+            <h2 id="ui-subchapter-title">Načítání podkapitoly...</h2>
+            <div class="subchapter-meta">
+              <span class="meta-stars" id="ui-subchapter-stars" aria-label="Získané hvězdy">☆☆☆</span>
+              <span class="meta-best-score" id="ui-subchapter-score">Nejlepší výsledek: —</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Vizuální ukazatel postupu v aktivní kapitole -->
+        <section class="chapter-progress-card" id="ui-chapter-progress" aria-label="Postup v aktuální kapitole"></section>
+
+        <!-- Příběhový panel Mistra -->
+        <section class="master-banner" id="ui-master-banner">
+          <div class="master-avatar" aria-hidden="true">M</div>
+          <div class="master-content">
+            <div class="master-name">Mistr návrhových diagramů tříd</div>
+            <p class="master-quote" id="ui-master-quote"></p>
+          </div>
+        </section>
+
+        <!-- Teoretická část (skryta v praktických kapitolách) -->
+        <section class="card theory-section" id="theory-section" hidden>
+          <div class="card-header">
+            <h3>Výklad látky</h3>
+            <span class="badge-tag badge-theory">Teorie UML 2.5</span>
+          </div>
+          <div class="theory-grid">
+            <div class="theory-text" id="ui-theory-html"></div>
+            <div class="static-diagram-box">
+              <div class="static-diagram-title" id="ui-static-caption">Ukázkový diagram</div>
+              <div class="static-diagram-stage" id="ui-static-diagram"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Zadání interaktivního úkolu -->
+        <section class="card assignment-section">
+          <div class="card-header">
+            <div>
+              <h3 id="ui-assignment-title">Interaktivní úkol</h3>
+              <span id="ui-inherited-badge" class="badge-tag badge-inherit" hidden>
+                Navazuje na plátno z předchozího kroku
+              </span>
+            </div>
+            <button type="button" id="btn-toggle-hints" class="btn btn-sm btn-ghost">
+              Zobrazit nápovědu
+            </button>
+          </div>
+
+          <div class="assignment-body">
+            <div id="ui-assignment-desc" class="assignment-desc"></div>
+            <ul id="ui-assignment-reqs" class="requirements-list"></ul>
+            <div id="ui-hints-box" class="hints-box" hidden></div>
+          </div>
+        </section>
+
+        <!-- Interaktivní UML editor -->
+        <section class="card editor-section">
+          <div class="card-header editor-header">
+            <h3>Interaktivní UML 2.5 plátno</h3>
+            <div class="editor-toolbar" id="editor-toolbar">
+              <button type="button" id="btn-connect-mode" class="btn btn-sm btn-outline" aria-pressed="false" title="Přepnout režim propojování tříd na plátně">
+                ⤳ Propojit třídy
+              </button>
+              <button type="button" id="btn-reset-canvas" class="btn btn-sm btn-outline" title="Vrátí třídy a vazby aktuálního kroku do výchozího stavu">
+                ↺ Resetovat aktuální plátno
+              </button>
+              <button type="button" id="btn-clear-canvas" class="btn btn-sm btn-ghost" hidden title="Úplně vyprázdní plátno včetně zděděných tříd">
+                Vyprázdnit vše
+              </button>
+              <button type="button" id="btn-validate" class="btn btn-sm btn-success">
+                Zkontrolovat diagram
+              </button>
+            </div>
+          </div>
+
+          <div class="editor-layout">
+            <!-- Paleta tříd -->
+            <div class="palette-panel">
+              <div class="panel-subheader">
+                <span>Paleta připravených tříd</span>
+                <small>Přetáhněte na plátno nebo klikněte</small>
+              </div>
+              <div id="uml-palette" class="uml-palette"></div>
+            </div>
+
+            <!-- Hlavní plátno + stavová lišta vazeb -->
+            <div class="canvas-column">
+              <div id="uml-canvas" class="uml-canvas" aria-label="Pracovní plátno UML diagramu"></div>
+              <div id="uml-relation-controls" class="relation-controls"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Patička s nenápadným odkazem na Ověřovač pro vyučujícího -->
+    <footer class="app-footer">
+      <span>Interaktivní mini-kurz návrhových diagramů tříd (UML 2.5)</span>
+      <a href="#overovac" id="link-open-verifier" class="footer-verifier-link">
+        Ověřovač certifikátu (pro vyučujícího)
+      </a>
+    </footer>
+  </div>
+
+  <!-- MODÁLNÍ OKNO: Příběhové uvítání při prvním spuštění -->
+  <div class="modal-backdrop" id="modal-onboarding" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+      <div class="modal-header">
+        <h3 id="onboarding-title">Vítej v cechu návrhových diagramů tříd</h3>
+      </div>
+      <div class="modal-body">
+        <div class="master-banner" style="margin-bottom:1rem;">
+          <div class="master-avatar" aria-hidden="true">M</div>
+          <div class="master-content">
+            <div class="master-name">Mistr návrhových diagramů tříd</div>
+            <p class="master-quote" id="onboarding-text"></p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="input-onboarding-name">Jak tě mám oslovovat? (volitelné – přezdívka nebo školní ID pro certifikát):</label>
+          <input type="text" id="input-onboarding-name" class="input" placeholder="např. novakj01 nebo Jana">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btn-onboarding-start" class="btn btn-primary">Vstoupit do učení →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODÁLNÍ OKNO: Zpětná vazba po kontrole diagramu -->
+  <div class="modal-backdrop" id="modal-feedback" hidden>
+    <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+      <div class="modal-header">
+        <h3 id="feedback-title">Výsledek kontroly diagramu</h3>
+        <button type="button" class="modal-close" data-close-modal="modal-feedback" aria-label="Zavřít">&times;</button>
+      </div>
+      <div class="modal-body" id="feedback-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal="modal-feedback">Opravit diagram</button>
+        <button type="button" id="btn-next-subchapter" class="btn btn-primary" hidden>Potvrdit výsledek a pokračovat →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODÁLNÍ OKNO: Odznaky kapitol -->
+  <div class="modal-backdrop" id="modal-badges" hidden>
+    <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="badges-title">
+      <div class="modal-header">
+        <h3 id="badges-title">Tematické odznaky kapitol</h3>
+        <button type="button" class="modal-close" data-close-modal="modal-badges" aria-label="Zavřít">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.86rem;color:#475569;margin-bottom:0.9rem;">
+          Odznak kapitoly získáš tehdy, když splníš všechny její podkapitoly alespoň na <strong>2 hvězdy (≥ 80 XP)</strong>.
+        </p>
+        <div id="badges-grid" class="badges-grid"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-close-modal="modal-badges">Zavřít</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODÁLNÍ OKNO: Certifikát a záloha postupu -->
+  <div class="modal-backdrop" id="modal-cert" hidden>
+    <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="cert-title">
+      <div class="modal-header">
+        <h3 id="cert-title">Certifikát a záloha postupu</h3>
+        <button type="button" class="modal-close" data-close-modal="modal-cert" aria-label="Zavřít">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="input-student-id">Jméno / identifikátor učedníka (pro certifikát a odevzdání):</label>
+          <div class="inline-form">
+            <input type="text" id="input-student-id" class="input" placeholder="např. novakj01">
+            <button type="button" id="btn-save-student-id" class="btn btn-sm btn-secondary">Uložit</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="textarea-cert-export">Aktuální Base64 certifikát (pro odeslání vyučujícímu ze školního e-mailu i zálohu postupu):</label>
+          <textarea id="textarea-cert-export" class="textarea code-text" rows="5" readonly></textarea>
+          <div class="action-row">
+            <button type="button" id="btn-copy-cert" class="btn btn-sm btn-primary">Zkopírovat Base64 certifikát</button>
+            <span id="cert-status-msg" class="status-msg"></span>
+          </div>
+          <small id="cert-queue-note" style="display:block;margin-top:0.45rem;color:#64748b;"></small>
+        </div>
+
+        <hr class="divider">
+
+        <div class="form-group">
+          <label for="textarea-cert-import">Obnovení postupu ze zálohy (vložte dříve uložený Base64 kód):</label>
+          <textarea id="textarea-cert-import" class="textarea code-text" rows="3" placeholder="Vložte Base64 řetězec..."></textarea>
+          <div class="action-row">
+            <button type="button" id="btn-import-cert" class="btn btn-sm btn-outline">Obnovit postup ze zálohy</button>
+            <button type="button" id="btn-reset-all" class="btn btn-sm btn-danger">Vymazat celý postup</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODÁLNÍ OKNO: Ověřovač certifikátu pro vyučujícího -->
+  <div class="modal-backdrop" id="modal-verifier" hidden>
+    <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="verifier-title">
+      <div class="modal-header">
+        <h3 id="verifier-title">Ověřovač certifikátu (pro vyučujícího)</h3>
+        <button type="button" class="modal-close" data-close-modal="modal-verifier" aria-label="Zavřít">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="textarea-verifier-input">Vložte Base64 řetězec od studenta k ověření podpisu integrity a časové osy pokusů:</label>
+          <textarea id="textarea-verifier-input" class="textarea code-text" rows="4" placeholder="Vložte Base64 certifikát..."></textarea>
+          <div class="action-row">
+            <button type="button" id="btn-run-verifier" class="btn btn-sm btn-primary">Ověřit certifikát</button>
+          </div>
+        </div>
+        <div id="verifier-output" class="verifier-output" hidden></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODÁLNÍ OKNO: Editor UML 2.5 vazby -->
+  <div class="modal-backdrop" id="modal-relation-editor" hidden>
+    <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="rel-modal-title">
+      <div class="modal-header">
+        <h3 id="rel-modal-title">Nastavení UML 2.5 vazby</h3>
+        <button type="button" class="modal-close" id="rel-modal-close" aria-label="Zavřít">&times;</button>
+      </div>
+      <div class="modal-body" id="rel-modal-body"></div>
+      <div class="modal-footer" id="rel-modal-footer"></div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
