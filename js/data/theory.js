@@ -3,8 +3,11 @@
  * V každé podkapitole používá výklad s ukázkovým diagramem jinou doménu než samostatné zadání,
  * přičemž napříč kapitolou jsou rovnoměrně zastoupeny všechny tři domény (Autoservis, Banka, Geometrie).
  *
- * Struktura zahrnuje jak přesná pole schématu (id, title, storyIntro, theoryHtml, exampleDiagram,
- * assignmentHtml, classes, validationRules), tak aliasy pro přímé napojení na app.js, editor.js a validator.js.
+ * Sladěno s konvencí návrhového diagramu tříd (UML 2.5) v předmětu UOMO:
+ * - Primární terminologie: multiplicita, řiditelnost.
+ * - V návrhovém modelu se nepoužívají neorientované ani obousměrné (<-->) asociace ani popisky vazeb.
+ * - Každá řiditelná vazba (asociace, agregace, kompozice) je realizována soukromým referenčním atributem
+ *   ve zdrojové třídě, jehož název a datový typ (Typ / List<Typ>) přesně odpovídají cílové roli a multiplicitě.
  */
 
 function normalizeTheorySubchapter(rawSub) {
@@ -189,62 +192,65 @@ const RAW_THEORY_SUBCHAPTERS = [
   },
 
   // =========================================================================
-  // t2: Jednoduchá asociace a násobnosti (kardinality)
+  // t2: Asociace a multiplicita (násobnost / kardinalita)
   // Výklad + ukázka: Autoservis | Zadání + validace: Geometrie (Malování)
   // =========================================================================
   {
     id: 't2',
     order: 2,
-    title: '1.2 Jednoduchá asociace a násobnosti (kardinality)',
-    shortTitle: '1.2 Asociace a násobnosti',
-    storyIntro: 'Samotné třídy ještě systém netvoří. Propoj je prostou obousměrnou asociací a pečlivě ověř násobnosti na obou koncích spojovací čáry.',
+    title: '1.2 Asociace a multiplicita (násobnost / kardinalita)',
+    shortTitle: '1.2 Asociace a multiplicita',
+    storyIntro: 'Samotné třídy ještě systém netvoří. V návrhovém modelu je propoj jednosměrnou řiditelnou asociací, nastav přesné multiplicity a nezapomeň na cílovou roli odpovídající referenčnímu atributu.',
     theoryHtml: `
       <h4>Co to je a k čemu to slouží</h4>
-      <p><strong>Jednoduchá (prostá) asociace</strong> vyjadřuje strukturální propojení mezi instancemi dvou tříd, které spolu v systému spolupracují, aniž by jedna třída byla strukturální součástí druhé (nejedná se o vztah celek–část). V návrhovém modelu asociace definuje, že instance jedné třídy drží v paměti odkaz (referenci nebo kolekci referencí) na instance druhé třídy.</p>
-      <p><strong>Násobnost (kardinalita)</strong> určuje přesný počet instancí jedné třídy, které mohou být v daný okamžik propojeny s jednou instancí třídy druhé. Z hlediska návrhu a implementace v Javě rozhoduje násobnost o tom, zda bude vazba v kódu reprezentována jednoduchým odkazem (např. <code>private Zakaznik vlastnik;</code>), nebo kolekcí (např. <code>private List&lt;Vozidlo&gt; vozidla;</code>), a definuje povinnost existence vazby (integritní omezení).</p>
+      <p><strong>Asociace</strong> vyjadřuje strukturální propojení mezi instancemi dvou tříd, které spolu v systému spolupracují, aniž by jedna třída byla strukturální součástí druhé (nejedná se o vztah celek–část). Zatímco v <em>analytickém modelu</em> se u asociací řiditelnost neřeší (kreslí se neorientovaná čára), v <strong>návrhovém modelu tříd</strong> musí mít každá asociace jednoznačně určenou <strong>jednosměrnou řiditelnost (<code>--&gt;</code>)</strong> a na cílovém konci <strong>roli</strong>.</p>
+      <p>V návrhovém modelu pro jazyk Java je každá řiditelná vazba (asociace, agregace i kompozice) realizována <strong>soukromým referenčním atributem ve zdrojové třídě</strong>. Název role na cílovém konci vazby se proto musí přesně shodovat s názvem tohoto referenčního atributu. V návrhovém modelu se rovněž neuvádějí slovní popisky uprostřed čáry, protože význam vztahu jednoznačně vyjadřuje právě cílová role a odpovídající referenční atribut.</p>
+      <p><strong>Multiplicita (násobnost / kardinalita)</strong> určuje přesný počet instancí jedné třídy, které mohou být v daný okamžik propojeny s jednou instancí třídy druhé. Při implementaci v Javě přímo rozhoduje o datovém typu referenčního atributu: zda půjde o jednoduchý odkaz (např. <code>-styl: Styl</code> pro <code>0..1</code> nebo <code>1</code>), nebo o kolekci (např. <code>-vozidla: List&lt;Vozidlo&gt;</code> pro <code>0..*</code> nebo <code>1..*</code>).</p>
 
       <h4>Jak se to zapisuje v UML</h4>
       <ul>
-        <li><strong>Grafická notace:</strong> Prostá asociace se zakresluje jako plná nepřerušovaná čára spojující obdélníky dvou tříd. Pokud na koncích čáry nejsou žádné šipky, jedná se o <strong>obousměrnou asociaci</strong> (obě třídy o sobě navzájem vědí a mohou spolu komunikovat).</li>
-        <li><strong>Popisek asociace:</strong> Uprostřed spojovací čáry se uvádí název asociace (zpravidla sloveso v činném rodě vystihující význam vztahu, např. <code>vlastní</code>).</li>
-        <li><strong>Zápis násobností:</strong> Na oba konce spojovací čáry těsně k okraji příslušné třídy se zapisuje rozsah <code>dolníMez..horníMez</code>. Nejčastější zápisy v návrhovém modelu jsou:
+        <li><strong>Grafická notace (návrhový model):</strong> Asociace se zakresluje jako plná čára zakončená <strong>otevřenou šipkou řiditelnosti (<code>--&gt;</code>)</strong> směřující od zdrojové třídy (která drží referenční atribut) k cílové třídě.</li>
+        <li><strong>Role na cílovém konci:</strong> U otevřené šipky se uvádí identifikátor role (v konvenci <code>camelCase</code>, bez diakritiky), který odpovídá soukromému referenčnímu atributu ve zdrojové třídě (např. role <code>vozidla</code> odpovídá atributu <code>-vozidla: List&lt;Vozidlo&gt;</code>). Popisky uprostřed čáry se v návrhovém modelu nepíší.</li>
+        <li><strong>Zápis multiplicit:</strong> Na oba konce spojovací čáry těsně k okraji příslušné třídy se zapisuje rozsah <code>dolníMez..horníMez</code>. Nejčastější zápisy jsou:
           <ul>
-            <li><code>1</code> – právě jedna instance (povinná jednoznačná vazba, zkrácený zápis pro <code>1..1</code>),</li>
-            <li><code>0..1</code> – žádná nebo nejvýše jedna instance (volitelná vazba, v Javě může být <code>null</code>),</li>
-            <li><code>1..*</code> – alespoň jedna až neomezeně mnoho instancí (povinná neprázdná kolekce),</li>
-            <li><code>0..*</code> (nebo <code>*</code>) – nula až neomezeně mnoho instancí (volitelná kolekce, může být prázdná).</li>
+            <li><code>1</code> – právě jedna instance (povinný jednoznačný odkaz, zkrácený zápis pro <code>1..1</code>),</li>
+            <li><code>0..1</code> – žádná nebo nejvýše jedna instance (volitelný odkaz, v Javě může být <code>null</code>),</li>
+            <li><code>1..*</code> – alespoň jedna až neomezeně mnoho instancí (povinná neprázdná kolekce <code>List&lt;Typ&gt;</code>),</li>
+            <li><code>0..*</code> (nebo <code>*</code>) – nula až neomezeně mnoho instancí (volitelná kolekce <code>List&lt;Typ&gt;</code>, může být prázdná).</li>
           </ul>
         </li>
       </ul>
 
       <h4>Na co si dát pozor (nejčastější chyby)</h4>
       <ul>
-        <li><strong>Duplikování vazby jako atributu uvnitř třídy:</strong> Nejčastější chybou začátečníků je zakreslení asociace mezi <code>Zakaznik</code> a <code>Vozidlo</code> a zároveň dopsání atributu <code>-vozidla: List&lt;Vozidlo&gt;</code> dovnitř třídy <code>Zakaznik</code>. V UML je asociace plnohodnotným ekvivalentem referenčního atributu – odkaz se zakresluje buď čarou asociace, nebo atributem, nikdy obojím současně.</li>
-        <li><strong>Prohození násobností na koncích vazby:</strong> Násobnost se vždy čte směrem od jedné instance protější třídy k cílové třídě. U vazby <code>Zakaznik "1" -- "1..*" Vozidlo</code> znamená <code>1..*</code> u vozidla, že jeden zákazník vlastní jedno až mnoho vozidel, zatímco <code>1</code> u zákazníka znamená, že jedno vozidlo patří právě jednomu zákazníkovi.</li>
-        <li><strong>Opomenutí násobností:</strong> V analytickém náčrtu lze násobnost dočasně vynechat, v návrhovém diagramu však musí být násobnost přesně stanovena na obou stranách každé asociace.</li>
+        <li><strong>Použití obousměrné (<code>&lt;--&gt;</code>) nebo neorientované asociace:</strong> V návrhovém modelu v UOMO se obousměrná asociace (<code>&lt;--&gt;</code>) ani neorientovaná asociace bez šipky nepoužívá. Každá asociace musí mít jednosměrnou řiditelnost (<code>--&gt;</code>) a cílovou roli.</li>
+        <li><strong>Chybějící referenční atribut nebo nesoulad s rolí:</strong> Studenti často napíšou roli u vazby, ale zapomenou uvést odpovídající referenční atribut ve zdrojové třídě – nebo název role neodpovídá názvu atributu. V návrhovém modelu musí název cílové role přesně odpovídat názvu referenčního atributu ve zdrojové třídě.</li>
+        <li><strong>Prohození multiplicit na koncích vazby:</strong> Multiplicita se vždy čte směrem od jedné instance protější třídy k cílové třídě. U vazby <code>Zakaznik "1" --&gt; "1..* vozidla" Vozidlo</code> znamená <code>1..*</code> u vozidla, že jeden zákazník vlastní jedno až mnoho vozidel, zatímco <code>1</code> u zákazníka znamená, že jedno vozidlo patří právě jednomu zákazníkovi.</li>
+        <li><strong>Opomenutí multiplicit:</strong> V návrhovém diagramu musí být multiplicita přesně stanovena na obou stranách každé asociace.</li>
       </ul>
 
       <h4>Komentovaný příklad</h4>
-      <p>Diagram propojuje třídy <code>Zakaznik</code> a <code>Vozidlo</code> prostou obousměrnou asociací s popiskem <code>vlastní</code>:</p>
+      <p>Diagram propojuje třídy <code>Zakaznik</code> a <code>Vozidlo</code> jednosměrnou řiditelnou asociací:</p>
       <ul>
-        <li>Na straně třídy <code>Vozidlo</code> je uvedena násobnost <code>1..*</code>, což vyjadřuje obchodní pravidlo, že osoba je v systému vedena jako zákazník pouze tehdy, když vlastní alespoň jedno vozidlo (horní počet není omezen).</li>
-        <li>Na straně třídy <code>Zakaznik</code> je uvedena násobnost <code>1</code>, což znamená, že každé vozidlo má v systému vždy právě jednoho vlastníka (spoluvlastnictví není podporováno).</li>
-        <li>Protože na čáře nejsou žádné šipky, vazba je obousměrná: zákazník zná všechna svá vozidla a každé vozidlo zná svého vlastníka.</li>
+        <li>Zdrojová třída <code>Zakaznik</code> obsahuje soukromý referenční atribut <code>-vozidla: List&lt;Vozidlo&gt;</code>, který realizuje vazbu na cílovou třídu <code>Vozidlo</code>.</li>
+        <li>Na cílové straně <code>Vozidlo</code> je otevřená šipka řiditelnosti, multiplicita <code>1..*</code> (zákazník vlastní alespoň jedno vozidlo, proto má atribut typ kolekce <code>List&lt;Vozidlo&gt;</code>) a role <code>vozidla</code> shodná s názvem referenčního atributu.</li>
+        <li>Na straně <code>Zakaznik</code> je uvedena multiplicita <code>1</code> (každé vozidlo patří právě jednomu zákazníkovi), avšak třída <code>Vozidlo</code> nedrží zpětný odkaz na zákazníka.</li>
       </ul>
     `,
     exampleDiagram: {
-      caption: 'Ukázkový příklad (Autoservis): Prostá obousměrná asociace Zakaznik (1) — vlastní — (1..*) Vozidlo',
+      caption: 'Ukázkový příklad (Autoservis): Jednosměrná řiditelná asociace Zakaznik (1) ──> (1..* vozidla) Vozidlo s referenčním atributem',
       classes: [
         {
           id: 'ex-t2-zakaznik',
           name: 'Zakaznik',
           stereotype: null,
           isAbstract: false,
-          x: 20,
-          y: 34,
+          x: 16,
+          y: 28,
           attributes: [
             { visibility: '-', name: 'zakaznikId', type: 'String', isStatic: false },
-            { visibility: '-', name: 'prijmeni', type: 'String', isStatic: false }
+            { visibility: '-', name: 'prijmeni', type: 'String', isStatic: false },
+            { visibility: '-', name: 'vozidla', type: 'List<Vozidlo>', isStatic: false }
           ],
           methods: [
             { visibility: '+', name: 'pridejVozidlo', params: 'vozidlo: Vozidlo', returnType: 'void', isAbstract: false, isStatic: false }
@@ -255,8 +261,8 @@ const RAW_THEORY_SUBCHAPTERS = [
           name: 'Vozidlo',
           stereotype: null,
           isAbstract: false,
-          x: 345,
-          y: 34,
+          x: 385,
+          y: 28,
           attributes: [
             { visibility: '-', name: 'vin', type: 'String', isStatic: false },
             { visibility: '-', name: 'spz', type: 'String', isStatic: false }
@@ -270,28 +276,28 @@ const RAW_THEORY_SUBCHAPTERS = [
         {
           id: 'ex-t2-rel-1',
           type: 'association',
-          navigability: 'bidirectional',
+          navigability: 'unidirectional',
           sourceId: 'ex-t2-zakaznik',
           targetId: 'ex-t2-vozidlo',
           sourceMultiplicity: '1',
           targetMultiplicity: '1..*',
-          label: 'vlastní'
+          targetRole: 'vozidla'
         }
       ]
     },
     assignmentHtml: `
-      <p>Vytvořte návrhový diagram tříd (UML 2.5) pro jazyk Java obsahující <strong>přesně dvě konkrétní třídy propojené jednou jednoduchou obousměrnou asociací</strong>. Odkaz mezi třídami vyjádřete výhradně vazbou, nikoli atributem uvnitř tříd; nemodelujte konstruktory ani další nespecifikované prvky.</p>
-      <p>Třída <strong>Tvar</strong> eviduje soukromý atribut (<code>-</code>) <code>tvarId</code> typu <code>String</code> a poskytuje veřejnou operaci (<code>+</code>) <code>priradStyl</code> s parametrem <code>styl</code> typu <code>Styl</code> a návratovým typem <code>void</code>.</p>
+      <p>Vytvořte návrhový diagram tříd (UML 2.5) pro jazyk Java obsahující <strong>přesně dvě konkrétní třídy propojené jednou jednosměrnou řiditelnou asociací</strong>. Vazba je ve zdrojové třídě realizována soukromým referenčním atributem, jehož název odpovídá cílové roli; nemodelujte konstruktory ani další nespecifikované prvky.</p>
+      <p>Třída <strong>Tvar</strong> eviduje soukromý atribut (<code>-</code>) <code>tvarId</code> typu <code>String</code>, soukromý referenční atribut (<code>-</code>) <code>styl</code> typu <code>Styl</code> a poskytuje veřejnou operaci (<code>+</code>) <code>priradStyl</code> s parametrem <code>styl</code> typu <code>Styl</code> a návratovým typem <code>void</code>.</p>
       <p>Třída <strong>Styl</strong> eviduje soukromé atributy (<code>-</code>) <code>stylId</code> typu <code>String</code> a <code>barvaVyplne</code> typu <code>String</code>. Poskytuje veřejnou operaci (<code>+</code>) <code>zmenBarvuVyplne</code> s parametrem <code>hexBarva</code> typu <code>String</code> a návratovým typem <code>boolean</code>.</p>
-      <p>Třídy <strong>Tvar</strong> a <strong>Styl</strong> propojte <strong>prostou obousměrnou asociací</strong> (bez šipek a bez kosočtverců) s popiskem <code>používá</code>. Jeden styl může používat libovolný počet tvarů nebo žádný (<code>0..*</code> na straně <code>Tvar</code>) a každý tvar může mít přiřazen nejvýše jeden styl nebo žádný (<code>0..1</code> na straně <code>Styl</code>). Názvy rolí na koncích vazby v této úloze neuvádějte.</p>
+      <p>Třídy <strong>Tvar</strong> a <strong>Styl</strong> propojte <strong>jednosměrnou řiditelnou asociací</strong> směřující z <code>Tvar</code> na <code>Styl</code> (otevřená šipka u <code>Styl</code>). Jeden styl může používat libovolný počet tvarů nebo žádný (multiplicita <code>0..*</code> na straně <code>Tvar</code>) a každý tvar může mít přiřazen nejvýše jeden styl nebo žádný (multiplicita <code>0..1</code> a role <code>styl</code> na straně <code>Styl</code>, odpovídající referenčnímu atributu <code>-styl: Styl</code> ve třídě <code>Tvar</code>).</p>
     `,
     requirements: [
-      'Umístěte na plátno třídy <strong>Tvar</strong> a <strong>Styl</strong>.',
-      'Propojte je <strong>prostou obousměrnou asociací</strong> (plná čára bez šipek) s popiskem <code>používá</code>.',
-      'Nastavte násobnost <code>0..*</code> na straně <code>Tvar</code> a <code>0..1</code> na straně <code>Styl</code> (bez názvů rolí).'
+      'Umístěte na plátno třídy <strong>Tvar</strong> (včetně referenčního atributu <code>-styl: Styl</code>) a <strong>Styl</strong>.',
+      'Propojte je <strong>jednosměrnou řiditelnou asociací</strong> směřující z <code>Tvar</code> na <code>Styl</code> (otevřená šipka u <code>Styl</code>).',
+      'Nastavte multiplicitu <code>0..*</code> na straně <code>Tvar</code> a multiplicitu <code>0..1</code> s rolí <code>styl</code> na straně <code>Styl</code>.'
     ],
     hints: [
-      'Zvolte typ vazby „Prostá obousměrná asociace“. Dejte pozor na správnou stranu násobností: u třídy Tvar má být 0..* a u třídy Styl má být 0..1.'
+      'V návrhovém modelu zvolte „Jednosměrná asociace (řiditelná)“ směřující z Tvar na Styl. Multiplicita u Tvar je 0..*, u Styl je 0..1 a role u cíle je styl (shodně s referenčním atributem -styl: Styl).'
     ],
     classes: [
       {
@@ -300,7 +306,8 @@ const RAW_THEORY_SUBCHAPTERS = [
         name: 'Tvar',
         isAbstract: false,
         attributes: [
-          { visibility: '-', name: 'tvarId', type: 'String', isStatic: false }
+          { visibility: '-', name: 'tvarId', type: 'String', isStatic: false },
+          { visibility: '-', name: 'styl', type: 'Styl', isStatic: false }
         ],
         methods: [
           { visibility: '+', name: 'priradStyl', params: 'styl: Styl', returnType: 'void', isAbstract: false, isStatic: false }
@@ -327,18 +334,19 @@ const RAW_THEORY_SUBCHAPTERS = [
         {
           id: 'rel-t2-1',
           type: 'association',
-          navigability: 'bidirectional',
+          navigability: 'unidirectional',
           sourceId: 't2-tvar',
           sourceMultiplicity: '0..*',
           sourceRole: null,
           targetId: 't2-styl',
           targetMultiplicity: '0..1',
-          targetRole: null,
-          label: 'používá',
+          targetRole: 'styl',
           feedback: {
-            wrongType: 'Mezi třídami Tvar a Styl použij prostou obousměrnou asociaci (plná čára bez šipek a bez kosočtverců).',
-            wrongSourceMultiplicity: 'U vazby Tvar – Styl zkontroluj násobnost na straně Tvar (jeden styl může používat 0 až libovolný počet tvarů: 0..*).',
-            wrongTargetMultiplicity: 'U vazby Tvar – Styl zkontroluj násobnost na straně Styl (tvar používá nejvýše jeden styl nebo žádný: 0..1).'
+            wrongType: 'V návrhovém modelu v UOMO použij mezi třídami Tvar a Styl jednosměrnou řiditelnou asociaci (otevřená šipka u Styl), nikoli obousměrnou asociaci (<-->).',
+            wrongDirection: 'Jednosměrná asociace mezi Tvar a Styl má obrácený směr – otevřená šipka řiditelnosti musí směřovat od Tvar k Styl (třída Tvar drží referenční atribut styl).',
+            wrongSourceMultiplicity: 'U vazby Tvar → Styl zkontroluj multiplicitu na straně Tvar (jeden styl může používat 0 až libovolný počet tvarů: 0..*).',
+            wrongTargetMultiplicity: 'U vazby Tvar → Styl zkontroluj multiplicitu na straně Styl (tvar používá nejvýše jeden styl nebo žádný: 0..1).',
+            wrongTargetRole: 'U vazby Tvar → Styl uveď na cílové straně Styl roli „styl“, která odpovídá referenčnímu atributu -styl: Styl ve třídě Tvar.'
           }
         }
       ]
@@ -346,43 +354,48 @@ const RAW_THEORY_SUBCHAPTERS = [
   },
 
   // =========================================================================
-  // t3: Navigovatelnost asociace a názvy rolí
+  // t3: Řiditelnost (navigovatelnost) asociace, role a referenční atributy
   // Výklad + ukázka: Geometrie (Malování) | Zadání + validace: Banka
   // =========================================================================
   {
     id: 't3',
     order: 3,
-    title: '1.3 Navigovatelnost asociace a názvy rolí',
-    shortTitle: '1.3 Navigovatelnost a role',
-    storyIntro: 'Minimalizuj obousměrné závislosti: otevřená šipka navigovatelnosti ukazuje směr reference v paměti a název role určuje jméno členské proměnné v cílovém směru.',
+    title: '1.3 Řiditelnost (navigovatelnost) asociace, role a referenční atributy',
+    shortTitle: '1.3 Řiditelnost a role',
+    storyIntro: 'Otevřená šipka řiditelnosti určuje směr odkazu v paměti a cílová role musí vždy přesně odpovídat soukromému referenčnímu atributu ve zdrojové třídě.',
     theoryHtml: `
       <h4>Co to je a k čemu to slouží</h4>
-      <p><strong>Navigovatelnost (směrovost)</strong> určuje, zda a jakým směrem dokáže objekt jedné třídy za běhu programu přistupovat k objektům třídy druhé. Zatímco v analýze jsou vazby často neorientované, v návrhovém modelu je minimalizace obousměrných vazeb klíčovým architektonickým pravidlem. Obousměrná vazba vytváří cyklickou závislost mezi třídami a komplikuje udržování konzistence dat v paměti. Pokud <code>Platno</code> potřebuje vědět, který <code>Tvar</code> je aktuálně označený, ale <code>Tvar</code> nepotřebuje znát odkaz na plátno, navrhneme vazbu jako jednosměrnou.</p>
-      <p><strong>Název role</strong> upřesňuje konkrétní význam (funkci), jakou cílová třída v dané asociaci plní. V návrhovém diagramu má název role přímý implementační dopad: stává se názvem členské proměnné (atributu) ve zdrojové třídě při generování kódu v jazyce Java.</p>
+      <p><strong>Řiditelnost (navigovatelnost)</strong> určuje, ze které třídy na kterou lze za běhu programu přistupovat pomocí uložené reference. V návrhovém modelu podle pravidel UOMO je každá asociace <strong>jednosměrně řiditelná</strong> – minimalizují se tak cyklické závislosti a zjednodušuje se správa konzistence objektů v paměti. Pokud <code>Platno</code> potřebuje vědět, který <code>Tvar</code> je aktuálně označený, ale <code>Tvar</code> nepotřebuje znát odkaz na plátno, vedeme šipku řiditelnosti výhradně z <code>Platno</code> na <code>Tvar</code>.</p>
+      <p><strong>Role a referenční atribut</strong> tvoří v návrhovém modelu neoddělitelnou dvojici. Každá řiditelná vazba je v kódu jazyka Java realizována <strong>soukromým referenčním atributem</strong> ve zdrojové třídě a <strong>název role</strong> u cílové šipky musí ukazovat právě na tento atribut. V návrhovém modelu se proto na čáru nepíší popisky asociace – význam vztahu je zcela jasný z role a referenčního atributu.</p>
 
       <h4>Jak se to zapisuje v UML</h4>
       <ul>
-        <li><strong>Jednosměrná navigovatelnost:</strong> Zapisuje se jako plná čára zakončená otevřenou šipkou (<code>--&gt;</code>) na straně cílové třídy, do které lze navigovat. Zdrojová třída na opačném konci (bez šipky) drží referenci na cíl, zatímco cílová třída odkaz zpět neudržuje.</li>
-        <li><strong>Obousměrná navigovatelnost:</strong> Zapisuje se buď plnou čárou bez šipek (<code>--</code>), nebo plnou čárou s otevřenými šipkami na obou koncích (<code>&lt;--&gt;</code>).</li>
-        <li><strong>Názvy rolí:</strong> Zapisují se jako identifikátor (zpravidla v konvenci <code>camelCase</code>, bez diakritiky) na příslušný konec asociační čáry vedle násobnosti (např. <code>oznacenyTvar</code> nebo <code>kotevniBod</code>). Pokud je vazba jednosměrná, název role se uvádí pouze u navigovatelného konce (u šipky).</li>
+        <li><strong>Jednosměrná řiditelnost:</strong> Zapisuje se jako plná čára zakončená <strong>otevřenou šipkou (<code>--&gt;</code>)</strong> na straně cílové třídy. Zdrojová třída na opačném konci (bez šipky) drží soukromý referenční atribut na cíl, zatímco cílová třída zpětný odkaz neudržuje.</li>
+        <li><strong>Vztah role a referenčního atributu:</strong> U otevřené šipky (cílového konce) se zapíše název role v konvenci <code>camelCase</code> (bez diakritiky) a ve zdrojové třídě se uvede soukromý atribut shodného jména:
+          <ul>
+            <li>pro cílovou multiplicitu <code>1</code> nebo <code>0..1</code> má referenční atribut typ cílové třídy (např. <code>-oznacenyTvar: Tvar</code>, <code>-kotevniBod: Bod</code>),</li>
+            <li>pro cílovou multiplicitu <code>0..*</code> nebo <code>1..*</code> má referenční atribut typ kolekce (např. <code>-transakce: List&lt;Transakce&gt;</code>).</li>
+          </ul>
+        </li>
       </ul>
 
       <h4>Na co si dát pozor (nejčastější chyby)</h4>
       <ul>
-        <li><strong>Opačný směr šipky navigovatelnosti:</strong> Šipka ukazuje od třídy, která drží odkaz, ke třídě, na kterou je odkazováno. Pokud tvar definuje svou polohu pomocí kotevního bodu, šipka musí směřovat z <code>Tvar</code> na <code>Bod</code>, nikoli naopak.</li>
-        <li><strong>Záměna otevřené asociační šipky za šipku dědičnosti:</strong> Navigovatelnost asociace používá jednoduchou otevřenou šipku (<code>--&gt;</code>), zatímco generalizace (dědičnost) používá uzavřený prázdný trojúhelník (<code>--|&gt;</code>).</li>
-        <li><strong>Nechtěné obousměrné vazby:</strong> Ponechání všech vazeb bez šipek nutí programátora udržovat oboustranné reference, což je v návrhu zbytečné a náchylné k chybám.</li>
+        <li><strong>Opačný směr šipky řiditelnosti:</strong> Šipka ukazuje od třídy, která obsahuje referenční atribut, ke třídě, na kterou je odkazováno. Pokud třída <code>Tvar</code> obsahuje <code>-kotevniBod: Bod</code>, šipka musí směřovat z <code>Tvar</code> na <code>Bod</code>, nikoli naopak.</li>
+        <li><strong>Obousměrná řiditelnost (<code>&lt;--&gt;</code>):</strong> Obousměrně řiditelná asociace se značí otevřenými šipkami na obou koncích a vyžadovala by vzájemně synchronizované referenční atributy v obou třídách – v návrhovém modelu v UOMO se nepoužívá.</li>
+        <li><strong>Záměna otevřené asociační šipky za šipku dědičnosti:</strong> Řiditelnost asociace používá jednoduchou otevřenou šipku (<code>--&gt;</code>), zatímco generalizace (dědičnost) používá uzavřený prázdný trojúhelník (<code>--|&gt;</code>).</li>
+        <li><strong>Nesoulad názvu role a referenčního atributu:</strong> Pokud je ve třídě atribut <code>-kotevniBod: Bod</code>, cílová role musí být přesně <code>kotevniBod</code> (nikoli např. <code>bod</code>).</li>
       </ul>
 
       <h4>Komentovaný příklad</h4>
-      <p>Diagram ukazuje řetězec dvou jednosměrných asociací mezi třemi třídami:</p>
+      <p>Diagram ukazuje řetězec dvou jednosměrných řiditelných asociací mezi třemi třídami včetně realizujících referenčních atributů:</p>
       <ul>
-        <li><strong>Platno → Tvar (označuje):</strong> Otevřená šipka u třídy <code>Tvar</code> s rolí <code>oznacenyTvar</code> a násobnostmi <code>0..1</code> na obou stranách určuje, že plátno si udržuje jednosměrný odkaz na nejvýše jeden právě vybraný tvar (pokud není vybrán žádný, odkaz je <code>null</code>), zatímco samotný tvar odkaz zpět na plátno neudržuje.</li>
-        <li><strong>Tvar → Bod (definuje polohu):</strong> Jednosměrná vazba s rolí <code>kotevniBod</code> a násobnostmi <code>1</code> na obou stranách vyjadřuje, že každý tvar drží přímý odkaz na svůj referenční bod, ale bod o tvaru neví.</li>
+        <li><strong>Platno → Tvar:</strong> Zdrojová třída <code>Platno</code> obsahuje soukromý referenční atribut <code>-oznacenyTvar: Tvar</code>. Otevřená šipka u třídy <code>Tvar</code> s rolí <code>oznacenyTvar</code> a multiplicitami <code>0..1</code> na obou stranách určuje, že plátno si pamatuje nejvýše jeden vybraný tvar (při neoznačení je hodnota <code>null</code>).</li>
+        <li><strong>Tvar → Bod:</strong> Zdrojová třída <code>Tvar</code> obsahuje soukromý referenční atribut <code>-kotevniBod: Bod</code>. Jednosměrná vazba s rolí <code>kotevniBod</code> a multiplicitami <code>1</code> na obou stranách vyjadřuje, že každý tvar drží přímý odkaz na svůj referenční bod, ale bod o tvaru neví.</li>
       </ul>
     `,
     exampleDiagram: {
-      caption: 'Ukázkový příklad (Geometrie): Řetězec dvou jednosměrných asociací s rolemi',
+      caption: 'Ukázkový příklad (Geometrie): Řetězec dvou jednosměrných řiditelných asociací s rolemi a referenčními atributy',
       classes: [
         {
           id: 'ex-t3-platno',
@@ -392,7 +405,8 @@ const RAW_THEORY_SUBCHAPTERS = [
           x: 16,
           y: 26,
           attributes: [
-            { visibility: '-', name: 'nazev', type: 'String', isStatic: false }
+            { visibility: '-', name: 'nazev', type: 'String', isStatic: false },
+            { visibility: '-', name: 'oznacenyTvar', type: 'Tvar', isStatic: false }
           ],
           methods: [
             { visibility: '+', name: 'oznacTvar', params: 'tvar: Tvar', returnType: 'void', isAbstract: false, isStatic: false }
@@ -403,10 +417,11 @@ const RAW_THEORY_SUBCHAPTERS = [
           name: 'Tvar',
           stereotype: null,
           isAbstract: false,
-          x: 345,
+          x: 385,
           y: 26,
           attributes: [
-            { visibility: '-', name: 'tvarId', type: 'String', isStatic: false }
+            { visibility: '-', name: 'tvarId', type: 'String', isStatic: false },
+            { visibility: '-', name: 'kotevniBod', type: 'Bod', isStatic: false }
           ],
           methods: [
             { visibility: '+', name: 'posun', params: 'dx: double, dy: double', returnType: 'void', isAbstract: false, isStatic: false }
@@ -417,8 +432,8 @@ const RAW_THEORY_SUBCHAPTERS = [
           name: 'Bod',
           stereotype: null,
           isAbstract: false,
-          x: 345,
-          y: 205,
+          x: 385,
+          y: 225,
           attributes: [
             { visibility: '-', name: 'x', type: 'double', isStatic: false },
             { visibility: '-', name: 'y', type: 'double', isStatic: false }
@@ -437,8 +452,7 @@ const RAW_THEORY_SUBCHAPTERS = [
           targetId: 'ex-t3-tvar',
           sourceMultiplicity: '0..1',
           targetMultiplicity: '0..1',
-          targetRole: 'oznacenyTvar',
-          label: 'označuje'
+          targetRole: 'oznacenyTvar'
         },
         {
           id: 'ex-t3-rel-2',
@@ -448,28 +462,27 @@ const RAW_THEORY_SUBCHAPTERS = [
           targetId: 'ex-t3-bod',
           sourceMultiplicity: '1',
           targetMultiplicity: '1',
-          targetRole: 'kotevniBod',
-          label: 'definuje polohu'
+          targetRole: 'kotevniBod'
         }
       ]
     },
     assignmentHtml: `
-      <p>Vytvořte návrhový diagram tříd (UML 2.5) pro jazyk Java obsahující <strong>přesně tři konkrétní třídy propojené dvěma jednosměrnými prostými asociacemi se zadanými rolemi</strong>. Odkazy vyjádřete výhradně vazbami; nemodelujte konstruktory ani další nespecifikované prvky.</p>
-      <p>Třída <strong>BankovniUcet</strong> má soukromý atribut (<code>-</code>) <code>cisloUctu</code> typu <code>String</code> a veřejnou operaci (<code>+</code>) <code>vloz</code> s parametrem <code>castka</code> typu <code>BigDecimal</code> vracející <code>boolean</code>.</p>
-      <p>Třída <strong>Transakce</strong> má soukromé atributy (<code>-</code>) <code>transakceId</code> typu <code>String</code> a <code>castka</code> typu <code>BigDecimal</code>, a veřejnou bezparametrickou operaci (<code>+</code>) <code>jeKaretniTransakce</code> vracející <code>boolean</code>.</p>
+      <p>Vytvořte návrhový diagram tříd (UML 2.5) pro jazyk Java obsahující <strong>přesně tři konkrétní třídy propojené dvěma jednosměrnými řiditelnými asociacemi se zadanými rolemi</strong>. Každá vazba je realizována soukromým referenčním atributem ve zdrojové třídě, na který ukazuje cílová role; nemodelujte konstruktory ani další nespecifikované prvky.</p>
+      <p>Třída <strong>BankovniUcet</strong> má soukromý atribut (<code>-</code>) <code>cisloUctu</code> typu <code>String</code>, soukromý referenční atribut (<code>-</code>) <code>transakce</code> typu <code>List&lt;Transakce&gt;</code> a veřejnou operaci (<code>+</code>) <code>vloz</code> s parametrem <code>castka</code> typu <code>BigDecimal</code> vracející <code>boolean</code>.</p>
+      <p>Třída <strong>Transakce</strong> má soukromé atributy (<code>-</code>) <code>transakceId</code> typu <code>String</code> a <code>castka</code> typu <code>BigDecimal</code>, soukromý referenční atribut (<code>-</code>) <code>pouzitaKarta</code> typu <code>PlatebniKarta</code> a veřejnou bezparametrickou operaci (<code>+</code>) <code>jeKaretniTransakce</code> vracející <code>boolean</code>.</p>
       <p>Třída <strong>PlatebniKarta</strong> má soukromý atribut (<code>-</code>) <code>cisloKarty</code> typu <code>String</code> a veřejnou operaci (<code>+</code>) <code>overPin</code> s parametrem <code>zadanyPin</code> typu <code>String</code> vracející <code>boolean</code>.</p>
       <ul>
-        <li>Mezi třídami <strong>BankovniUcet</strong> a <strong>Transakce</strong> vytvořte prostou jednosměrnou asociaci směřující z <code>BankovniUcet</code> na <code>Transakce</code> (šipka u <code>Transakce</code>) s popiskem <code>eviduje</code>. Na straně <code>BankovniUcet</code> uveďte násobnost <code>1</code> (bez názvu role), na straně <code>Transakce</code> uveďte násobnost <code>0..*</code> a název role <code>transakce</code>.</li>
-        <li>Mezi třídami <strong>Transakce</strong> a <strong>PlatebniKarta</strong> vytvořte prostou jednosměrnou asociaci směřující z <code>Transakce</code> na <code>PlatebniKarta</code> (šipka u <code>PlatebniKarta</code>) s popiskem <code>provedena pomocí</code>. Na straně <code>Transakce</code> uveďte násobnost <code>0..*</code> (bez názvu role), na straně <code>PlatebniKarta</code> uveďte násobnost <code>0..1</code> a název role <code>pouzitaKarta</code>.</li>
+        <li>Mezi třídami <strong>BankovniUcet</strong> a <strong>Transakce</strong> vytvořte jednosměrnou řiditelnou asociaci směřující z <code>BankovniUcet</code> na <code>Transakce</code> (otevřená šipka u <code>Transakce</code>). Na straně <code>BankovniUcet</code> uveďte multiplicitu <code>1</code>, na straně <code>Transakce</code> uveďte multiplicitu <code>0..*</code> a roli <code>transakce</code> (odpovídající atributu <code>-transakce: List&lt;Transakce&gt;</code>).</li>
+        <li>Mezi třídami <strong>Transakce</strong> a <strong>PlatebniKarta</strong> vytvořte jednosměrnou řiditelnou asociaci směřující z <code>Transakce</code> na <code>PlatebniKarta</code> (otevřená šipka u <code>PlatebniKarta</code>). Na straně <code>Transakce</code> uveďte multiplicitu <code>0..*</code>, na straně <code>PlatebniKarta</code> uveďte multiplicitu <code>0..1</code> a roli <code>pouzitaKarta</code> (odpovídající atributu <code>-pouzitaKarta: PlatebniKarta</code>).</li>
       </ul>
     `,
     requirements: [
-      'Umístěte na plátno třídy <strong>BankovniUcet</strong>, <strong>Transakce</strong> a <strong>PlatebniKarta</strong>.',
-      'Vytvořte jednosměrnou asociaci <code>BankovniUcet (1)</code> → <code>Transakce (0..*, role: transakce)</code> s popiskem <code>eviduje</code>.',
-      'Vytvořte jednosměrnou asociaci <code>Transakce (0..*)</code> → <code>PlatebniKarta (0..1, role: pouzitaKarta)</code> s popiskem <code>provedena pomocí</code>.'
+      'Umístěte na plátno třídy <strong>BankovniUcet</strong> (s atributem <code>-transakce: List&lt;Transakce&gt;</code>), <strong>Transakce</strong> (s atributem <code>-pouzitaKarta: PlatebniKarta</code>) a <strong>PlatebniKarta</strong>.',
+      'Vytvořte jednosměrnou řiditelnou asociaci <code>BankovniUcet (1)</code> → <code>Transakce (0..*, role: transakce)</code>.',
+      'Vytvořte jednosměrnou řiditelnou asociaci <code>Transakce (0..*)</code> → <code>PlatebniKarta (0..1, role: pouzitaKarta)</code>.'
     ],
     hints: [
-      'Šipka směřuje od třídy držící odkaz k cílové třídě: nejprve BankovniUcet → Transakce (role transakce), poté Transakce → PlatebniKarta (role pouzitaKarta).'
+      'Šipka řiditelnosti směřuje od třídy obsahující referenční atribut k cílové třídě: BankovniUcet → Transakce (role transakce) a Transakce → PlatebniKarta (role pouzitaKarta).'
     ],
     classes: [
       {
@@ -478,7 +491,8 @@ const RAW_THEORY_SUBCHAPTERS = [
         name: 'BankovniUcet',
         isAbstract: false,
         attributes: [
-          { visibility: '-', name: 'cisloUctu', type: 'String', isStatic: false }
+          { visibility: '-', name: 'cisloUctu', type: 'String', isStatic: false },
+          { visibility: '-', name: 'transakce', type: 'List<Transakce>', isStatic: false }
         ],
         methods: [
           { visibility: '+', name: 'vloz', params: 'castka: BigDecimal', returnType: 'boolean', isAbstract: false, isStatic: false }
@@ -491,7 +505,8 @@ const RAW_THEORY_SUBCHAPTERS = [
         isAbstract: false,
         attributes: [
           { visibility: '-', name: 'transakceId', type: 'String', isStatic: false },
-          { visibility: '-', name: 'castka', type: 'BigDecimal', isStatic: false }
+          { visibility: '-', name: 'castka', type: 'BigDecimal', isStatic: false },
+          { visibility: '-', name: 'pouzitaKarta', type: 'PlatebniKarta', isStatic: false }
         ],
         methods: [
           { visibility: '+', name: 'jeKaretniTransakce', params: '', returnType: 'boolean', isAbstract: false, isStatic: false }
@@ -524,9 +539,8 @@ const RAW_THEORY_SUBCHAPTERS = [
           targetId: 't3-transakce',
           targetMultiplicity: '0..*',
           targetRole: 'transakce',
-          label: 'eviduje',
           feedback: {
-            wrongTargetRole: 'U jednosměrné asociace BankovniUcet → Transakce zkontroluj název role u cílové třídy Transakce (má být "transakce").'
+            wrongTargetRole: 'U jednosměrné asociace BankovniUcet → Transakce zkontroluj název role u cílové třídy Transakce – musí odpovídat referenčnímu atributu -transakce: List<Transakce> (má být „transakce“).'
           }
         },
         {
@@ -539,10 +553,9 @@ const RAW_THEORY_SUBCHAPTERS = [
           targetId: 't3-karta',
           targetMultiplicity: '0..1',
           targetRole: 'pouzitaKarta',
-          label: 'provedena pomocí',
           feedback: {
-            wrongTargetMultiplicity: 'U vazby Transakce → PlatebniKarta nastav násobnost na straně PlatebniKarta na "0..1" (bezhotovostní převod kartu nepoužívá).',
-            wrongTargetRole: 'U jednosměrné asociace Transakce → PlatebniKarta zkontroluj název role u cílové třídy PlatebniKarta (má být "pouzitaKarta").'
+            wrongTargetMultiplicity: 'U vazby Transakce → PlatebniKarta nastav multiplicitu na straně PlatebniKarta na „0..1“ (bezhotovostní převod kartu nepoužívá).',
+            wrongTargetRole: 'U jednosměrné asociace Transakce → PlatebniKarta zkontroluj název role u cílové třídy PlatebniKarta – musí odpovídat referenčnímu atributu -pouzitaKarta: PlatebniKarta (má být „pouzitaKarta“).'
           }
         }
       ]
@@ -562,42 +575,43 @@ const RAW_THEORY_SUBCHAPTERS = [
     theoryHtml: `
       <h4>Co to je a k čemu to slouží</h4>
       <p><strong>Agregace</strong> je speciální formou asociace, která vyjadřuje vztah <strong>celek–část</strong> (vztah „má / sdružuje“), při němž mají celek i jeho části <strong>nezávislý životní cyklus</strong>. Část je organizačně zařazena do celku, ale její existence není na existenci celku podmíněna – pokud objekt celku zanikne (je smazán), objekty jeho částí v systému nadále existují a mohou být přiřazeny k jinému celku nebo fungovat samostatně.</p>
-      <p>V návrhovém modelu pomáhá agregace odlišit pouhé organizační seskupení sdílených nebo samostatně existujících entit od striktního vlastnictví životního cyklu (kompozice).</p>
+      <p>V návrhovém modelu pomáhá agregace odlišit pouhé organizační seskupení sdílených nebo samostatně existujících entit od striktního vlastnictví životního cyklu (kompozice). Stejně jako běžná asociace má jednosměrnou řiditelnost od celku k části a je realizována soukromým referenčním atributem ve třídě celku.</p>
 
       <h4>Jak se to zapisuje v UML</h4>
       <ul>
-        <li><strong>Grafická notace:</strong> Agregace se zakresluje jako asociace zakončená <strong>prázdným (nevyplněným) kosočtvercem na straně celku</strong> (<code>o--</code> nebo <code>o--&gt;</code> při jednosměrné navigovatelnosti).</li>
-        <li><strong>Násobnosti a role:</strong> Na straně celku (u prázdného kosočtverce) bývá násobnost nejčastěji <code>0..1</code> (část nemusí být v daný okamžik přiřazena k žádnému celku, případně je v jednom celku) nebo <code>0..*</code> (pokud může být stejná část sdílena více celky současně). Na straně části se uvádí odpovídající násobnost (<code>0..*</code>, <code>1..*</code> apod.) a název role kolekce.</li>
+        <li><strong>Grafická notace:</strong> Agregace se zakresluje jako jednosměrná řiditelná vazba zakončená <strong>prázdným (nevyplněným) kosočtvercem na straně celku</strong> a otevřenou šipkou řiditelnosti na straně části (<code>o--&gt;</code>).</li>
+        <li><strong>Multiplicity, role a referenční atribut:</strong> Na straně celku (u prázdného kosočtverce) bývá multiplicita nejčastěji <code>0..1</code> (část nemusí být v daný okamžik přiřazena k žádnému celku, případně je v jednom celku) nebo <code>0..*</code> (pokud může být stejná část sdílena více celky současně). Na straně části se uvádí odpovídající multiplicita (<code>0..*</code>, <code>1..*</code> apod.) a název role kolekce shodný se soukromým referenčním atributem ve třídě celku.</li>
       </ul>
 
       <h4>Na co si dát pozor (nejčastější chyby)</h4>
       <ul>
         <li><strong>Umístění kosočtverce na špatný konec vazby:</strong> Kosočtverec patří vždy na stranu celku (nadřazeného kontejneru), nikoli na stranu části.</li>
-        <li><strong>Záměna agregace a kompozice:</strong> Pokud zánik celku automaticky znamená smazání všech částí (např. smazání objednávky smaže její řádky), nejde o agregaci, ale o kompozici.</li>
-        <li><strong>Násobnost 1 na straně celku u agregace:</strong> Pokud by část mohla existovat výhradně v rámci právě jednoho celku (<code>1</code>), v praxi jde téměř vždy o kompozici. Pro agregaci je typická volitelná příslušnost (<code>0..1</code>) nebo sdílení (<code>0..*</code>).</li>
+        <li><strong>Záměna agregace a kompozice:</strong> Pokud zánik celku automaticky znamená smazání všech částí (např. smazání zakázky smaže její řádky), nejde o agregaci, ale o kompozici.</li>
+        <li><strong>Multiplicita 1 na straně celku u agregace:</strong> Pokud by část mohla existovat výhradně v rámci právě jednoho celku (<code>1</code>), v praxi jde téměř vždy o kompozici. Pro agregaci je typická volitelná příslušnost (<code>0..1</code>) nebo sdílení (<code>0..*</code>).</li>
       </ul>
 
       <h4>Komentovaný příklad</h4>
-      <p>Diagram zachycuje organizační vztah mezi třídou <code>Pobocka</code> (celek) a třídou <code>Klient</code> (část) pomocí jednosměrné agregace <code>spravuje</code>:</p>
+      <p>Diagram zachycuje organizační vztah mezi třídou <code>Pobocka</code> (celek) a třídou <code>Klient</code> (část) pomocí jednosměrné řiditelné agregace:</p>
       <ul>
-        <li>Prázdný kosočtverec u třídy <code>Pobocka</code> značí, že pobočka sdružuje své <code>kmenoviKlienti</code> (<code>0..*</code>).</li>
-        <li>Násobnost <code>0..1</code> na straně pobočky vyjadřuje, že klient spadá nejvýše pod jednu kmenovou pobočku, ale může v systému existovat i bez přiřazené pobočky (např. čistě digitální klient).</li>
+        <li>Prázdný kosočtverec u třídy <code>Pobocka</code> a její soukromý referenční atribut <code>-kmenoviKlienti: List&lt;Klient&gt;</code> značí, že pobočka sdružuje své kmenové klienty (cílová role <code>kmenoviKlienti</code>, multiplicita <code>0..*</code>).</li>
+        <li>Multiplicita <code>0..1</code> na straně pobočky vyjadřuje, že klient spadá nejvýše pod jednu kmenovou pobočku, ale může v systému existovat i bez přiřazené pobočky (např. čistě digitální klient).</li>
         <li>Pokud banka konkrétní pobočku zruší, záznamy klientů v systému nezanikají – klienti si uchovávají své účty a mohou být převedeni pod jinou pobočku.</li>
       </ul>
     `,
     exampleDiagram: {
-      caption: 'Ukázkový příklad (Banka): Jednosměrná agregace Pobocka (0..1) ◇— spravuje —> (0..*) Klient',
+      caption: 'Ukázkový příklad (Banka): Jednosměrná řiditelná agregace Pobocka (0..1) ◇──> (0..* kmenoviKlienti) Klient',
       classes: [
         {
           id: 'ex-t4-pobocka',
           name: 'Pobocka',
           stereotype: null,
           isAbstract: false,
-          x: 20,
-          y: 34,
+          x: 16,
+          y: 28,
           attributes: [
             { visibility: '-', name: 'kodPobocky', type: 'String', isStatic: false },
-            { visibility: '-', name: 'mesto', type: 'String', isStatic: false }
+            { visibility: '-', name: 'mesto', type: 'String', isStatic: false },
+            { visibility: '-', name: 'kmenoviKlienti', type: 'List<Klient>', isStatic: false }
           ],
           methods: [
             { visibility: '+', name: 'priradKlienta', params: 'klient: Klient', returnType: 'void', isAbstract: false, isStatic: false }
@@ -608,8 +622,8 @@ const RAW_THEORY_SUBCHAPTERS = [
           name: 'Klient',
           stereotype: null,
           isAbstract: false,
-          x: 365,
-          y: 34,
+          x: 395,
+          y: 28,
           attributes: [
             { visibility: '-', name: 'klientId', type: 'String', isStatic: false },
             { visibility: '-', name: 'prijmeni', type: 'String', isStatic: false }
@@ -628,24 +642,23 @@ const RAW_THEORY_SUBCHAPTERS = [
           targetId: 'ex-t4-klient',
           sourceMultiplicity: '0..1',
           targetMultiplicity: '0..*',
-          targetRole: 'kmenoviKlienti',
-          label: 'spravuje'
+          targetRole: 'kmenoviKlienti'
         }
       ]
     },
     assignmentHtml: `
-      <p>Vytvořte návrhový diagram tříd (UML 2.5) pro jazyk Java obsahující <strong>přesně dvě konkrétní třídy propojené jednou jednosměrnou agregací</strong>. Odkaz vyjádřete výhradně vazbou; nemodelujte konstruktory ani další nespecifikované prvky.</p>
-      <p>Třída <strong>Paleta</strong> eviduje soukromý atribut (<code>-</code>) <code>nazev</code> typu <code>String</code> a nabízí veřejnou operaci (<code>+</code>) <code>pridejStyl</code> s parametrem <code>styl</code> typu <code>Styl</code> a návratovým typem <code>void</code>.</p>
+      <p>Vytvořte návrhový diagram tříd (UML 2.5) pro jazyk Java obsahující <strong>přesně dvě konkrétní třídy propojené jednou jednosměrnou řiditelnou agregací</strong>. Vazba je realizována soukromým referenčním atributem ve třídě celku; nemodelujte konstruktory ani další nespecifikované prvky.</p>
+      <p>Třída <strong>Paleta</strong> eviduje soukromý atribut (<code>-</code>) <code>nazev</code> typu <code>String</code>, soukromý referenční atribut (<code>-</code>) <code>styly</code> typu <code>List&lt;Styl&gt;</code> a nabízí veřejnou operaci (<code>+</code>) <code>pridejStyl</code> s parametrem <code>styl</code> typu <code>Styl</code> a návratovým typem <code>void</code>.</p>
       <p>Třída <strong>Styl</strong> eviduje soukromé atributy (<code>-</code>) <code>stylId</code> typu <code>String</code> a <code>barvaVyplne</code> typu <code>String</code>. Nabízí veřejnou operaci (<code>+</code>) <code>zmenBarvuVyplne</code> s parametrem <code>hexBarva</code> typu <code>String</code> a návratovým typem <code>boolean</code>.</p>
-      <p>Paleta sdružuje styly jako <strong>slabá vazba celek–část s nezávislým životním cyklem</strong> (při smazání palety styly v systému nadále zůstávají). Modelujte <strong>jednosměrnou agregaci</strong> z celku <code>Paleta</code> (prázdný kosočtverec u <code>Paleta</code>) k části <code>Styl</code> (šipka navigovatelnosti u <code>Styl</code>) s popiskem <code>sdružuje</code>. Na straně <code>Paleta</code> uveďte násobnost <code>0..1</code> (bez názvu role), na straně <code>Styl</code> uveďte násobnost <code>0..*</code> a název role <code>styly</code>.</p>
+      <p>Paleta sdružuje styly jako <strong>slabá vazba celek–část s nezávislým životním cyklem</strong> (při smazání palety styly v systému nadále zůstávají). Modelujte <strong>jednosměrnou řiditelnou agregaci</strong> z celku <code>Paleta</code> (prázdný kosočtverec u <code>Paleta</code>) k části <code>Styl</code> (šipka řiditelnosti u <code>Styl</code>). Na straně <code>Paleta</code> uveďte multiplicitu <code>0..1</code>, na straně <code>Styl</code> uveďte multiplicitu <code>0..*</code> a roli <code>styly</code> (odpovídající referenčnímu atributu <code>-styly: List&lt;Styl&gt;</code>).</p>
     `,
     requirements: [
-      'Umístěte na plátno třídy <strong>Paleta</strong> a <strong>Styl</strong>.',
-      'Propojte je <strong>jednosměrnou agregací</strong> (prázdný kosočtverec u <code>Paleta</code>, otevřená šipka u <code>Styl</code>) s popiskem <code>sdružuje</code>.',
-      'Nastavte násobnost <code>0..1</code> u <code>Paleta</code> a <code>0..*</code> s rolí <code>styly</code> u <code>Styl</code>.'
+      'Umístěte na plátno třídy <strong>Paleta</strong> (s referenčním atributem <code>-styly: List&lt;Styl&gt;</code>) a <strong>Styl</strong>.',
+      'Propojte je <strong>jednosměrnou řiditelnou agregací</strong> (prázdný kosočtverec u <code>Paleta</code>, otevřená šipka u <code>Styl</code>).',
+      'Nastavte multiplicitu <code>0..1</code> u <code>Paleta</code> a multiplicitu <code>0..*</code> s rolí <code>styly</code> u <code>Styl</code>.'
     ],
     hints: [
-      'Styly přežijí i smazání palety – použijte jednosměrnou agregaci (prázdný kosočtverec u celku Paleta) s násobností 0..1 u Paleta a 0..* (role styly) u Styl.'
+      'Styly přežijí i smazání palety – použijte jednosměrnou agregaci (prázdný kosočtverec u celku Paleta) s multiplicitou 0..1 u Paleta a 0..* (role styly odpovídající -styly: List<Styl>) u Styl.'
     ],
     classes: [
       {
@@ -654,7 +667,8 @@ const RAW_THEORY_SUBCHAPTERS = [
         name: 'Paleta',
         isAbstract: false,
         attributes: [
-          { visibility: '-', name: 'nazev', type: 'String', isStatic: false }
+          { visibility: '-', name: 'nazev', type: 'String', isStatic: false },
+          { visibility: '-', name: 'styly', type: 'List<Styl>', isStatic: false }
         ],
         methods: [
           { visibility: '+', name: 'pridejStyl', params: 'styl: Styl', returnType: 'void', isAbstract: false, isStatic: false }
@@ -688,11 +702,10 @@ const RAW_THEORY_SUBCHAPTERS = [
           targetId: 't4-styl',
           targetMultiplicity: '0..*',
           targetRole: 'styly',
-          label: 'sdružuje',
           feedback: {
-            wrongType: 'Mezi třídami Paleta a Styl jde o slabý vztah celek–část s nezávislým životním cyklem – použij agregaci (prázdný kosočtverec), nikoli kompozici.',
-            wrongSourceMultiplicity: 'Na straně celku Paleta nastav násobnost "0..1" (styl může existovat i mimo jakoukoli paletu).',
-            wrongTargetRole: 'Na straně části Styl uveď název role "styly".'
+            wrongType: 'Mezi třídami Paleta a Styl jde o slabý vztah celek–část s nezávislým životním cyklem – použij jednosměrnou agregaci (prázdný kosočtverec), nikoli kompozici.',
+            wrongSourceMultiplicity: 'Na straně celku Paleta nastav multiplicitu „0..1“ (styl může existovat i mimo jakoukoli paletu).',
+            wrongTargetRole: 'Na straně části Styl uveď název role „styly“ odpovídající referenčnímu atributu -styly: List<Styl> ve třídě Paleta.'
           }
         }
       ]
@@ -717,39 +730,40 @@ const RAW_THEORY_SUBCHAPTERS = [
         <li>V daný okamžik může být konkrétní instance části součástí nejvýše jednoho celku (část nelze sdílet mezi více celky).</li>
         <li>Při zániku (odstranění) celku jsou automaticky a kaskádově zničeny i všechny jeho části.</li>
       </ul>
-      <p>V návrhovém modelu a při implementaci v Javě kompozice přímo určuje odpovědnost za vytváření a rušení objektů (kaskádové mazání a uvolňování v paměti).</p>
+      <p>V návrhovém modelu a při implementaci v Javě kompozice přímo určuje odpovědnost za vytváření a rušení objektů (kaskádové mazání a uvolňování v paměti) a je ve třídě celku realizována soukromým referenčním atributem (kolekcí či jedním odkazem).</p>
 
       <h4>Jak se to zapisuje v UML</h4>
       <ul>
-        <li><strong>Grafická notace:</strong> Kompozice se zakresluje jako asociace zakončená <strong>plným (černě vyplněným) kosočtvercem na straně celku</strong> (<code>*--</code> nebo <code>*--&gt;</code> při jednosměrné navigovatelnosti).</li>
-        <li><strong>Násobnosti a role:</strong> Na straně celku (u plného kosočtverce) je násobnost vždy <code>1</code> (nebo výjimečně <code>0..1</code>, pokud může být daný typ části volitelně vlastněn jiným typem celku, nikdy však <code>*</code>). Na straně části se uvádí násobnost podle doménových pravidel (<code>1</code>, <code>0..1</code>, <code>1..*</code>, <code>0..*</code>) a název role.</li>
+        <li><strong>Grafická notace:</strong> Kompozice se zakresluje jako jednosměrná řiditelná vazba zakončená <strong>plným (černě vyplněným) kosočtvercem na straně celku</strong> a otevřenou šipkou řiditelnosti na straně části (<code>*--&gt;</code>).</li>
+        <li><strong>Multiplicity, role a referenční atribut:</strong> Na straně celku (u plného kosočtverce) je multiplicita vždy <code>1</code> (nebo výjimečně <code>0..1</code>, pokud může být daný typ části volitelně vlastněn jiným typem celku, nikdy však <code>*</code>). Na straně části se uvádí multiplicita podle doménových pravidel (<code>1</code>, <code>0..1</code>, <code>1..*</code>, <code>0..*</code>) a název role shodný se soukromým referenčním atributem ve třídě celku.</li>
       </ul>
 
       <h4>Na co si dát pozor (nejčastější chyby)</h4>
       <ul>
-        <li><strong>Násobnost * nebo 1..* na straně plného kosočtverce:</strong> Protože kompozice zakazuje sdílení jedné instance části mezi více celky současně, násobnost na straně celku nesmí být nikdy větší než <code>1</code>.</li>
-        <li><strong>Nadužívání kompozice tam, kde jde o prostou asociaci:</strong> Například mezi <code>Platno</code> a označeným <code>Tvar</code> není kompozice (zrušením označení tvar nezaniká), zatímco mezi <code>Platno</code> a <code>Vrstva</code> kompozice je.</li>
+        <li><strong>Multiplicita * nebo 1..* na straně plného kosočtverce:</strong> Protože kompozice zakazuje sdílení jedné instance části mezi více celky současně, multiplicita na straně celku nesmí být nikdy větší než <code>1</code>.</li>
+        <li><strong>Nadužívání kompozice tam, kde jde o běžnou asociaci:</strong> Například mezi <code>Platno</code> a označeným <code>Tvar</code> není kompozice (zrušením označení tvar nezaniká), zatímco mezi <code>Platno</code> a <code>Vrstva</code> kompozice je.</li>
       </ul>
 
       <h4>Komentovaný příklad</h4>
-      <p>Diagram modeluje strukturální vztah mezi třídou <code>Platno</code> (celek) a třídou <code>Vrstva</code> (část) pomocí jednosměrné kompozice <code>obsahuje</code>:</p>
+      <p>Diagram modeluje strukturální vztah mezi třídou <code>Platno</code> (celek) a třídou <code>Vrstva</code> (část) pomocí jednosměrné řiditelné kompozice:</p>
       <ul>
-        <li>Plný kosočtverec u třídy <code>Platno</code> s násobností <code>1</code> vyjadřuje, že každá kreslicí vrstva je neoddělitelnou součástí právě jednoho plátna, nemůže existovat samostatně a při zavření či odstranění plátna zanikají i všechny jeho vrstvy.</li>
-        <li>Násobnost <code>1..*</code> a role <code>vrstvy</code> na straně třídy <code>Vrstva</code> určují, že každé plátno musí obsahovat alespoň jednu vrstvu (horní počet není omezen) a udržuje na ně jednosměrný odkaz.</li>
+        <li>Plný kosočtverec u třídy <code>Platno</code> s multiplicitou <code>1</code> vyjadřuje, že každá kreslicí vrstva je neoddělitelnou součástí právě jednoho plátna, nemůže existovat samostatně a při zavření či odstranění plátna zanikají i všechny jeho vrstvy.</li>
+        <li>Multiplicita <code>1..*</code> a role <code>vrstvy</code> na straně třídy <code>Vrstva</code> odpovídají soukromému referenčnímu atributu <code>-vrstvy: List&lt;Vrstva&gt;</code> ve třídě <code>Platno</code> a určují, že každé plátno obsahuje alespoň jednu vrstvu.</li>
       </ul>
     `,
     exampleDiagram: {
-      caption: 'Ukázkový příklad (Geometrie): Jednosměrná kompozice Platno (1) ◆— obsahuje —> (1..*) Vrstva',
+      caption: 'Ukázkový příklad (Geometrie): Jednosměrná řiditelná kompozice Platno (1) ◆──> (1..* vrstvy) Vrstva',
       classes: [
         {
           id: 'ex-t5-platno',
           name: 'Platno',
           stereotype: null,
           isAbstract: false,
-          x: 20,
-          y: 34,
+          x: 16,
+          y: 28,
           attributes: [
-            { visibility: '-', name: 'nazev', type: 'String', isStatic: false }
+            { visibility: '-', name: 'nazev', type: 'String', isStatic: false },
+            { visibility: '-', name: 'vrstvy', type: 'List<Vrstva>', isStatic: false }
           ],
           methods: [
             { visibility: '+', name: 'pridejVrstvu', params: 'vrstva: Vrstva', returnType: 'void', isAbstract: false, isStatic: false }
@@ -760,8 +774,8 @@ const RAW_THEORY_SUBCHAPTERS = [
           name: 'Vrstva',
           stereotype: null,
           isAbstract: false,
-          x: 345,
-          y: 34,
+          x: 385,
+          y: 28,
           attributes: [
             { visibility: '-', name: 'vrstvaId', type: 'String', isStatic: false },
             { visibility: '-', name: 'poradiZ', type: 'int', isStatic: false }
@@ -780,24 +794,23 @@ const RAW_THEORY_SUBCHAPTERS = [
           targetId: 'ex-t5-vrstva',
           sourceMultiplicity: '1',
           targetMultiplicity: '1..*',
-          targetRole: 'vrstvy',
-          label: 'obsahuje'
+          targetRole: 'vrstvy'
         }
       ]
     },
     assignmentHtml: `
-      <p>Vytvořte návrhový diagram tříd (UML 2.5) pro jazyk Java obsahující <strong>přesně dvě konkrétní třídy propojené jednou jednosměrnou kompozicí</strong>. Odkaz mezi třídami vyjádřete výhradně vazbou; nemodelujte konstruktory ani další nespecifikované prvky.</p>
-      <p>Třída <strong>ServisniZakazka</strong> eviduje soukromé atributy (<code>-</code>) <code>cisloZakazky</code> typu <code>String</code> a <code>stav</code> typu <code>String</code>. Nabízí veřejnou operaci (<code>+</code>) <code>pridejPolozku</code> s parametrem <code>polozka</code> typu <code>PolozkaZakazky</code> a návratovým typem <code>void</code>.</p>
+      <p>Vytvořte návrhový diagram tříd (UML 2.5) pro jazyk Java obsahující <strong>přesně dvě konkrétní třídy propojené jednou jednosměrnou řiditelnou kompozicí</strong>. Vazba je realizována soukromým referenčním atributem ve třídě celku; nemodelujte konstruktory ani další nespecifikované prvky.</p>
+      <p>Třída <strong>ServisniZakazka</strong> eviduje soukromé atributy (<code>-</code>) <code>cisloZakazky</code> typu <code>String</code> a <code>stav</code> typu <code>String</code>, soukromý referenční atribut (<code>-</code>) <code>polozky</code> typu <code>List&lt;PolozkaZakazky&gt;</code> a nabízí veřejnou operaci (<code>+</code>) <code>pridejPolozku</code> s parametrem <code>polozka</code> typu <code>PolozkaZakazky</code> a návratovým typem <code>void</code>.</p>
       <p>Třída <strong>PolozkaZakazky</strong> eviduje soukromé atributy (<code>-</code>) <code>polozkaId</code> typu <code>String</code> a <code>popis</code> typu <code>String</code>. Nabízí veřejnou bezparametrickou operaci (<code>+</code>) <code>vypoctiMezisoucet</code> s návratovým typem <code>BigDecimal</code>.</p>
-      <p>Položka zakázky je <strong>existenčně závislou součástí servisní zakázky</strong> a při zrušení zakázky zanikají všechny její položky. Modelujte <strong>jednosměrnou kompozici</strong> z celku <code>ServisniZakazka</code> (plný kosočtverec u <code>ServisniZakazka</code>) k části <code>PolozkaZakazky</code> (šipka navigovatelnosti u <code>PolozkaZakazky</code>) s popiskem <code>obsahuje</code>. Na straně <code>ServisniZakazka</code> uveďte násobnost <code>1</code> (bez názvu role), na straně <code>PolozkaZakazky</code> uveďte násobnost <code>1..*</code> a název role <code>polozky</code>.</p>
+      <p>Položka zakázky je <strong>existenčně závislou součástí servisní zakázky</strong> a při zrušení zakázky zanikají všechny její položky. Modelujte <strong>jednosměrnou řiditelnou kompozici</strong> z celku <code>ServisniZakazka</code> (plný kosočtverec u <code>ServisniZakazka</code>) k části <code>PolozkaZakazky</code> (šipka řiditelnosti u <code>PolozkaZakazky</code>). Na straně <code>ServisniZakazka</code> uveďte multiplicitu <code>1</code>, na straně <code>PolozkaZakazky</code> uveďte multiplicitu <code>1..*</code> a roli <code>polozky</code> (odpovídající referenčnímu atributu <code>-polozky: List&lt;PolozkaZakazky&gt;</code>).</p>
     `,
     requirements: [
-      'Umístěte na plátno třídy <strong>ServisniZakazka</strong> a <strong>PolozkaZakazky</strong>.',
-      'Propojte je <strong>jednosměrnou kompozicí</strong> (plný kosočtverec u <code>ServisniZakazka</code>, otevřená šipka u <code>PolozkaZakazky</code>) s popiskem <code>obsahuje</code>.',
-      'Nastavte násobnost <code>1</code> u <code>ServisniZakazka</code> a <code>1..*</code> s rolí <code>polozky</code> u <code>PolozkaZakazky</code>.'
+      'Umístěte na plátno třídy <strong>ServisniZakazka</strong> (s referenčním atributem <code>-polozky: List&lt;PolozkaZakazky&gt;</code>) a <strong>PolozkaZakazky</strong>.',
+      'Propojte je <strong>jednosměrnou řiditelnou kompozicí</strong> (plný kosočtverec u <code>ServisniZakazka</code>, otevřená šipka u <code>PolozkaZakazky</code>).',
+      'Nastavte multiplicitu <code>1</code> u <code>ServisniZakazka</code> a multiplicitu <code>1..*</code> s rolí <code>polozky</code> u <code>PolozkaZakazky</code>.'
     ],
     hints: [
-      'Plný kosočtverec kompozice patří vždy na stranu celku (ServisniZakazka) a násobnost u něj musí být přesně 1.'
+      'Plný kosočtverec kompozice patří vždy na stranu celku (ServisniZakazka), multiplicita u něj musí být přesně 1 a cílová role polozky odpovídá atributu -polozky: List<PolozkaZakazky>.'
     ],
     classes: [
       {
@@ -807,7 +820,8 @@ const RAW_THEORY_SUBCHAPTERS = [
         isAbstract: false,
         attributes: [
           { visibility: '-', name: 'cisloZakazky', type: 'String', isStatic: false },
-          { visibility: '-', name: 'stav', type: 'String', isStatic: false }
+          { visibility: '-', name: 'stav', type: 'String', isStatic: false },
+          { visibility: '-', name: 'polozky', type: 'List<PolozkaZakazky>', isStatic: false }
         ],
         methods: [
           { visibility: '+', name: 'pridejPolozku', params: 'polozka: PolozkaZakazky', returnType: 'void', isAbstract: false, isStatic: false }
@@ -841,11 +855,10 @@ const RAW_THEORY_SUBCHAPTERS = [
           targetId: 't5-polozka',
           targetMultiplicity: '1..*',
           targetRole: 'polozky',
-          label: 'obsahuje',
           feedback: {
-            wrongType: 'Položka zakázky nemůže existovat bez své servisní zakázky – použij kompozici (plný kosočtverec), nikoli agregaci.',
-            wrongSourceMultiplicity: 'U kompozice mezi ServisniZakazka a PolozkaZakazky musí být na straně celku (ServisniZakazka) násobnost "1".',
-            wrongTargetRole: 'Na straně části PolozkaZakazky uveď název role "polozky".'
+            wrongType: 'Položka zakázky nemůže existovat bez své servisní zakázky – použij jednosměrnou kompozici (plný kosočtverec), nikoli agregaci.',
+            wrongSourceMultiplicity: 'U kompozice mezi ServisniZakazka a PolozkaZakazky musí být na straně celku (ServisniZakazka) multiplicita „1“.',
+            wrongTargetRole: 'Na straně části PolozkaZakazky uveď název role „polozky“ odpovídající referenčnímu atributu -polozky: List<PolozkaZakazky> ve třídě ServisniZakazka.'
           }
         }
       ]
@@ -861,7 +874,7 @@ const RAW_THEORY_SUBCHAPTERS = [
     order: 6,
     title: '1.6 Generalizace a dědičnost (rodič vs. potomek)',
     shortTitle: '1.6 Generalizace a dědičnost',
-    storyIntro: 'Společné vlastnosti a operace přesuň do nadtřídy a pamatuj: prázdný trojúhelník dědičnosti vždy míří od potomka k rodiči a nikdy na něj nepatří násobnosti.',
+    storyIntro: 'Společné vlastnosti a operace přesuň do nadtřídy a pamatuj: prázdný trojúhelník dědičnosti vždy míří od potomka k rodiči a nikdy na něj nepatří multiplicity ani role.',
     theoryHtml: `
       <h4>Co to je a k čemu to slouží</h4>
       <p><strong>Generalizace (dědičnost)</strong> je vztah mezi obecnější nadtřídou (rodičem / předkem) a specializovanější podtřídou (potomkem), známý jako vztah typu <strong>„je“ (is-a)</strong> – např. <em>Osobní auto je vozidlo</em>. V návrhovém modelu slouží dědičnost k:</p>
@@ -875,7 +888,7 @@ const RAW_THEORY_SUBCHAPTERS = [
       <ul>
         <li><strong>Grafická notace:</strong> Generalizace se zakresluje jako plná čára zakončená <strong>velkým prázdným (nevyplněným) trojúhelníkem směřujícím k nadtřídě</strong> (<code>&lt;|--</code>).</li>
         <li><strong>Překrývání metod a chráněná viditelnost:</strong> Pokud podtřída mění chování zděděné metody, zapíše se signatura této metody znovu do podtřídy. Atributy a pomocné metody v nadtřídě, ke kterým mají potomci přímo přistupovat, se označují viditelností <code>#</code> (<code>protected</code>).</li>
-        <li><strong>Bez násobností a popisků:</strong> Na čáře generalizace se nikdy neuvádějí násobnosti, role ani názvy asociací, protože nejde o vazbu mezi dvěma objekty, ale o vztah mezi dvěma třídami v typovém systému.</li>
+        <li><strong>Bez multiplicit a rolí:</strong> Na čáře generalizace se nikdy neuvádějí multiplicity ani role, protože nejde o vazbu mezi dvěma objekty, ale o vztah mezi dvěma třídami v typovém systému.</li>
       </ul>
 
       <h4>Na co si dát pozor (nejčastější chyby)</h4>
@@ -965,8 +978,8 @@ const RAW_THEORY_SUBCHAPTERS = [
     `,
     requirements: [
       'Umístěte na plátno konkrétní třídy <strong>BankovniUcet</strong>, <strong>BeznyUcet</strong> a <strong>SporiciUcet</strong>.',
-      'Vytvořte vazbu <strong>generalizace</strong> od potomka <code>BeznyUcet</code> (zdroj) k rodiči <code>BankovniUcet</code> (cíl) bez násobností.',
-      'Vytvořte vazbu <strong>generalizace</strong> od potomka <code>SporiciUcet</code> (zdroj) k rodiči <code>BankovniUcet</code> (cíl) bez násobností.'
+      'Vytvořte vazbu <strong>generalizace</strong> od potomka <code>BeznyUcet</code> (zdroj) k rodiči <code>BankovniUcet</code> (cíl) bez multiplicit a rolí.',
+      'Vytvořte vazbu <strong>generalizace</strong> od potomka <code>SporiciUcet</code> (zdroj) k rodiči <code>BankovniUcet</code> (cíl) bez multiplicit a rolí.'
     ],
     hints: [
       'Zvolte typ „Generalizace / dědičnost“ a veďte vazbu vždy od podtřídy (BeznyUcet, SporiciUcet) k nadtřídě (BankovniUcet).'
