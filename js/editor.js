@@ -1,9 +1,10 @@
 /**
- * Plnohodnotný interaktivní i statický editor návrhových diagramů tříd dle UML 2.5.
- * - Drag-and-Drop (Pointer Events) pro myš i dotyk
+ * Plnohodnotný interaktivní i statický editor návrhových diagramů tříd dle UML 2.5 (konvence UOMO).
+ * - Drag-and-Drop (Pointer Events) pro myš i dotyk s fixním náhledem (odolný vůči odscrollování)
  * - Dědění souřadnic a vazeb při inheritPreviousCanvas: true s aktualizací definic tříd
- * - Kliknutí na vazbu ji vybere (lze smazat klávesou Delete / Backspace), dvojklik nebo tlačítko Upravit otevře editor vazby
- * - Přesné UML 2.5 markery a automatické zakřivení vícenásobných vazeb mezi stejnou dvojicí tříd
+ * - Kliknutí na vazbu ji vybere (smazání klávesou Delete / Backspace), dvojklik nebo tlačítko Upravit otevře editor vazby
+ * - Přesné UML 2.5 markery (včetně <──> pro obousměrnou asociaci), zakřivení vícenásobných vazeb
+ *   a nekolizní rozmístění štítků multiplicity a role pro vodorovné, šikmé i vertikální vazby
  */
 
 const MULTIPLICITY_OPTIONS = [
@@ -16,44 +17,34 @@ const MULTIPLICITY_OPTIONS = [
 
 const RELATION_PRESETS = [
   {
-    key: 'association_bi',
-    type: 'association',
-    navigability: 'bidirectional',
-    label: 'Prostá obousměrná asociace',
-    symbol: '───',
-    allowMultiplicity: true,
-    allowRoles: true,
-    allowLabel: true
-  },
-  {
     key: 'association_uni',
     type: 'association',
     navigability: 'unidirectional',
-    label: 'Prostá jednosměrná asociace',
+    label: 'Jednosměrná asociace (řiditelná)',
     symbol: '──>',
     allowMultiplicity: true,
-    allowRoles: true,
-    allowLabel: true
+    allowSourceRole: false,
+    allowTargetRole: true
   },
   {
     key: 'aggregation_uni',
     type: 'aggregation',
     navigability: 'unidirectional',
-    label: 'Agregace jednosměrná',
+    label: 'Agregace (jednosměrná řiditelná)',
     symbol: '◇──>',
     allowMultiplicity: true,
-    allowRoles: true,
-    allowLabel: true
+    allowSourceRole: false,
+    allowTargetRole: true
   },
   {
     key: 'composition_uni',
     type: 'composition',
     navigability: 'unidirectional',
-    label: 'Kompozice jednosměrná',
+    label: 'Kompozice (jednosměrná řiditelná)',
     symbol: '◆──>',
     allowMultiplicity: true,
-    allowRoles: true,
-    allowLabel: true
+    allowSourceRole: false,
+    allowTargetRole: true
   },
   {
     key: 'generalization',
@@ -62,8 +53,8 @@ const RELATION_PRESETS = [
     label: 'Generalizace / dědičnost',
     symbol: '──▷',
     allowMultiplicity: false,
-    allowRoles: false,
-    allowLabel: false
+    allowSourceRole: false,
+    allowTargetRole: false
   },
   {
     key: 'realization',
@@ -72,8 +63,18 @@ const RELATION_PRESETS = [
     label: 'Realizace rozhraní',
     symbol: '┄┄▷',
     allowMultiplicity: false,
-    allowRoles: false,
-    allowLabel: false
+    allowSourceRole: false,
+    allowTargetRole: false
+  },
+  {
+    key: 'association_bi',
+    type: 'association',
+    navigability: 'bidirectional',
+    label: 'Obousměrná asociace (oboustranně řiditelná)',
+    symbol: '<──>',
+    allowMultiplicity: true,
+    allowSourceRole: true,
+    allowTargetRole: true
   }
 ];
 
@@ -98,8 +99,8 @@ function getPresetKeyFromRelation(rel) {
   if (rel.type === 'realization') return 'realization';
   if (rel.type === 'aggregation') return 'aggregation_uni';
   if (rel.type === 'composition') return 'composition_uni';
-  if (rel.type === 'association' && isUnidirectionalNav(rel.navigability)) return 'association_uni';
-  return 'association_bi';
+  if (rel.type === 'association' && !isUnidirectionalNav(rel.navigability)) return 'association_bi';
+  return 'association_uni';
 }
 
 function formatAttribute(attr) {
@@ -210,6 +211,7 @@ function createSvgElement(tag, attrs = {}) {
 function buildSvgDefs(prefix) {
   const defs = createSvgElement('defs');
 
+  // Otevřená šipka na cíli (-->)
   const arrowOpen = createSvgElement('marker', {
     id: `${prefix}-arrow-open`,
     viewBox: '0 0 14 12',
@@ -229,6 +231,27 @@ function buildSvgDefs(prefix) {
     'stroke-linejoin': 'round'
   }));
 
+  // Otevřená šipka na zdroji (<--) pro obousměrně řiditelnou asociaci (<-->)
+  const arrowOpenStart = createSvgElement('marker', {
+    id: `${prefix}-arrow-open-start`,
+    viewBox: '0 0 14 12',
+    markerWidth: '14',
+    markerHeight: '12',
+    refX: '1',
+    refY: '6',
+    orient: 'auto',
+    markerUnits: 'userSpaceOnUse'
+  });
+  arrowOpenStart.appendChild(createSvgElement('path', {
+    d: 'M 12 1.5 L 1 6 L 12 10.5',
+    fill: 'none',
+    stroke: '#1e3a5f',
+    'stroke-width': '1.8',
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round'
+  }));
+
+  // Prázdný trojúhelník pro generalizaci a realizaci rozhraní
   const arrowTriangle = createSvgElement('marker', {
     id: `${prefix}-arrow-triangle`,
     viewBox: '0 0 16 14',
@@ -247,6 +270,7 @@ function buildSvgDefs(prefix) {
     'stroke-linejoin': 'round'
   }));
 
+  // Prázdný kosočtverec pro agregaci
   const diamondOpen = createSvgElement('marker', {
     id: `${prefix}-diamond-open`,
     viewBox: '0 0 18 12',
@@ -265,6 +289,7 @@ function buildSvgDefs(prefix) {
     'stroke-linejoin': 'round'
   }));
 
+  // Plný kosočtverec pro kompozici
   const diamondFilled = createSvgElement('marker', {
     id: `${prefix}-diamond-filled`,
     viewBox: '0 0 18 12',
@@ -283,7 +308,7 @@ function buildSvgDefs(prefix) {
     'stroke-linejoin': 'round'
   }));
 
-  defs.append(arrowOpen, arrowTriangle, diamondOpen, diamondFilled);
+  defs.append(arrowOpen, arrowOpenStart, arrowTriangle, diamondOpen, diamondFilled);
   return defs;
 }
 
@@ -322,11 +347,15 @@ function evalQuadBezier(p0, q, p2, t) {
   return { x, y, tx: tx / len, ty: ty / len };
 }
 
+function estimateBadgeWidth(text) {
+  return Math.max(18, String(text).length * 6.8 + 10);
+}
+
 function appendSvgBadgeText(parent, x, y, text, className = 'uml-svg-label') {
   if (!text) return;
   const group = createSvgElement('g', { class: `${className}-group` });
 
-  const approxW = Math.max(18, text.length * 6.8 + 10);
+  const approxW = estimateBadgeWidth(text);
   const approxH = 17;
 
   const bg = createSvgElement('rect', {
@@ -349,6 +378,61 @@ function appendSvgBadgeText(parent, x, y, text, className = 'uml-svg-label') {
 
   group.append(bg, labelEl);
   parent.appendChild(group);
+}
+
+/**
+ * Nekolizní rozmístění štítků multiplicity a role na konci vazby:
+ * - U svislých úseků (|ty| > |tx|) umístí multiplicitu vlevo (multW / 2 + 10)
+ *   a roli vpravo (roleW / 2 + 10) od osy čáry, takže se nikdy nemohou překrýt.
+ * - U vodorovných úseků (|tx| >= |ty|) umístí multiplicitu nad čáru (-15 px)
+ *   a roli pod čáru (+16 px) s odstupem od okraje třídy.
+ */
+function placeEndpointBadges(edgeGroup, pt, edgeEndPt, midPt, multiplicity, role, hasMarker) {
+  if (!multiplicity && !role) return;
+
+  const isVertical = Math.abs(pt.ty) > Math.abs(pt.tx);
+  const multW = multiplicity ? estimateBadgeWidth(multiplicity) : 0;
+  const roleW = role ? estimateBadgeWidth(role) : 0;
+
+  if (isVertical) {
+    const multX = pt.x - (multW / 2 + 10);
+    const roleX = pt.x + (roleW / 2 + 10);
+
+    // Mírný posun od okraje třídy / šipky / kosočtverce podél svislé osy
+    const inwardDirY = Math.sign(midPt.y - edgeEndPt.y) || 1;
+    const minVerticalClearance = hasMarker ? 26 : 18;
+    const currentDistY = Math.abs(pt.y - edgeEndPt.y);
+    const maxDistY = Math.max(minVerticalClearance, Math.abs(midPt.y - edgeEndPt.y) - 6);
+    const safeDistY = Math.min(Math.max(currentDistY, minVerticalClearance), maxDistY);
+    const badgeY = edgeEndPt.y + inwardDirY * safeDistY;
+
+    if (multiplicity) {
+      appendSvgBadgeText(edgeGroup, multX, badgeY, multiplicity, 'uml-svg-mult');
+    }
+    if (role) {
+      appendSvgBadgeText(edgeGroup, roleX, badgeY, role, 'uml-svg-role');
+    }
+    return;
+  }
+
+  // Vodorovný / mírně šikmý úsek: multiplicita nad čarou (-15 px), role pod čarou (+16 px)
+  const inwardDirX = Math.sign(midPt.x - edgeEndPt.x) || 1;
+  const halfSpanX = Math.abs(midPt.x - edgeEndPt.x);
+  const markerClearance = hasMarker ? 16 : 8;
+
+  const computeSafeHorizontalX = (badgeW) => {
+    const currentDistX = Math.abs(pt.x - edgeEndPt.x);
+    const desiredDistX = Math.max(currentDistX, badgeW / 2 + markerClearance);
+    const maxDistX = Math.max(currentDistX, halfSpanX);
+    return edgeEndPt.x + inwardDirX * Math.min(desiredDistX, maxDistX);
+  };
+
+  if (multiplicity) {
+    appendSvgBadgeText(edgeGroup, computeSafeHorizontalX(multW), pt.y - 15, multiplicity, 'uml-svg-mult');
+  }
+  if (role) {
+    appendSvgBadgeText(edgeGroup, computeSafeHorizontalX(roleW), pt.y + 16, role, 'uml-svg-role');
+  }
 }
 
 function renderSvgRelations(svgEl, nodesMap, relations, options = {}) {
@@ -423,28 +507,41 @@ function renderSvgRelations(svgEl, nodesMap, relations, options = {}) {
       }
 
       const pathAttrs = { d: pathData, class: 'uml-edge-path' };
+      const isBidirectionalAssoc = rel.type === 'association' && !isUnidirectionalNav(rel.navigability);
 
       if (rel.type === 'realization' || rel.type === 'dependency') {
         pathAttrs['stroke-dasharray'] = '7 5';
       }
 
+      let hasStartMarker = false;
+      let hasEndMarker = false;
+
       if (rel.type === 'generalization' || rel.type === 'realization') {
         pathAttrs['marker-end'] = `url(#${prefix}-arrow-triangle)`;
+        hasEndMarker = true;
       } else {
         if (rel.type === 'aggregation') {
           pathAttrs['marker-start'] = `url(#${prefix}-diamond-open)`;
+          hasStartMarker = true;
         } else if (rel.type === 'composition') {
           pathAttrs['marker-start'] = `url(#${prefix}-diamond-filled)`;
+          hasStartMarker = true;
+        } else if (isBidirectionalAssoc) {
+          // Obousměrně řiditelná asociace má dle konvence UOMO otevřenou šipku na obou koncích (<──>)
+          pathAttrs['marker-start'] = `url(#${prefix}-arrow-open-start)`;
+          hasStartMarker = true;
         }
 
         const shouldShowTargetArrow =
           isUnidirectionalNav(rel.navigability) ||
+          isBidirectionalAssoc ||
           rel.type === 'aggregation' ||
           rel.type === 'composition' ||
           rel.type === 'dependency';
 
         if (shouldShowTargetArrow) {
           pathAttrs['marker-end'] = `url(#${prefix}-arrow-open)`;
+          hasEndMarker = true;
         }
       }
 
@@ -455,9 +552,12 @@ function renderSvgRelations(svgEl, nodesMap, relations, options = {}) {
         : controlPt;
 
       const edgeLen = Math.hypot(p2.x - p1.x, p2.y - p1.y) || 1;
-      const endOffsetPx = Math.min(34, Math.max(20, edgeLen * 0.22));
-      const tSrc = Math.min(0.32, (rel.type === 'aggregation' || rel.type === 'composition' ? endOffsetPx + 10 : endOffsetPx) / edgeLen);
-      const tTgt = Math.max(0.68, 1 - (endOffsetPx + 4) / edgeLen);
+      const baseEndOffsetPx = Math.min(34, Math.max(22, edgeLen * 0.22));
+      const srcOffsetPx = hasStartMarker ? baseEndOffsetPx + 10 : baseEndOffsetPx;
+      const tgtOffsetPx = hasEndMarker ? baseEndOffsetPx + 8 : baseEndOffsetPx;
+
+      const tSrc = Math.min(0.34, srcOffsetPx / edgeLen);
+      const tTgt = Math.max(0.66, 1 - tgtOffsetPx / edgeLen);
 
       const midPt = evalQuadBezier(p1, qEval, p2, 0.5);
       const srcPt = evalQuadBezier(p1, qEval, p2, tSrc);
@@ -473,23 +573,8 @@ function renderSvgRelations(svgEl, nodesMap, relations, options = {}) {
         );
       }
 
-      const srcNormX = -srcPt.ty;
-      const srcNormY = srcPt.tx;
-      if (rel.sourceMultiplicity) {
-        appendSvgBadgeText(edgeGroup, srcPt.x + srcNormX * 15, srcPt.y + srcNormY * 15, rel.sourceMultiplicity, 'uml-svg-mult');
-      }
-      if (rel.sourceRole) {
-        appendSvgBadgeText(edgeGroup, srcPt.x - srcNormX * 16, srcPt.y - srcNormY * 16, rel.sourceRole, 'uml-svg-role');
-      }
-
-      const tgtNormX = -tgtPt.ty;
-      const tgtNormY = tgtPt.tx;
-      if (rel.targetMultiplicity) {
-        appendSvgBadgeText(edgeGroup, tgtPt.x + tgtNormX * 15, tgtPt.y + tgtNormY * 15, rel.targetMultiplicity, 'uml-svg-mult');
-      }
-      if (rel.targetRole) {
-        appendSvgBadgeText(edgeGroup, tgtPt.x - tgtNormX * 16, tgtPt.y - tgtNormY * 16, rel.targetRole, 'uml-svg-role');
-      }
+      placeEndpointBadges(edgeGroup, srcPt, p1, midPt, rel.sourceMultiplicity, rel.sourceRole, hasStartMarker);
+      placeEndpointBadges(edgeGroup, tgtPt, p2, midPt, rel.targetMultiplicity, rel.targetRole, hasEndMarker);
 
       svgEl.appendChild(edgeGroup);
     });
@@ -701,7 +786,7 @@ export class UmlCanvasEditor {
           const relType = r.type || 'association';
           const defaultNav = (relType === 'generalization' || relType === 'realization')
             ? 'none'
-            : 'bidirectional';
+            : 'unidirectional';
           return {
             id: r.id || `rel-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
             type: relType,
@@ -871,6 +956,7 @@ export class UmlCanvasEditor {
           isDragging = true;
           ghost = document.createElement('div');
           ghost.className = 'uml-class-box palette-drag-ghost';
+          ghost.style.position = 'fixed';
           ghost.innerHTML = buildUmlClassInnerHtml(classDef, { showReturnBtn: false });
           document.body.appendChild(ghost);
         }
@@ -913,8 +999,8 @@ export class UmlCanvasEditor {
           upEvt.clientY <= rect.bottom;
 
         if (overCanvas) {
-          const x = upEvt.clientX - rect.left + this.canvasEl.scrollLeft - 95;
-          const y = upEvt.clientY - rect.top + this.canvasEl.scrollTop - 30;
+          const x = Math.max(12, Math.round(upEvt.clientX - rect.left + this.canvasEl.scrollLeft - 95));
+          const y = Math.max(12, Math.round(upEvt.clientY - rect.top + this.canvasEl.scrollTop - 30));
           this.addClassToCanvas(classDef.id, x, y);
         }
       };
@@ -1235,10 +1321,11 @@ export class UmlCanvasEditor {
         <button type="button" class="relation-pill-edit">
           <strong>${escapeHtml(srcName)}</strong>
           ${rel.sourceMultiplicity ? `<span class="pill-mult">[${escapeHtml(rel.sourceMultiplicity)}]</span>` : ''}
+          ${rel.sourceRole ? `<em class="pill-role">(${escapeHtml(rel.sourceRole)})</em>` : ''}
           <span class="pill-sym">${escapeHtml(preset.symbol)}</span>
           <strong>${escapeHtml(tgtName)}</strong>
           ${rel.targetMultiplicity ? `<span class="pill-mult">[${escapeHtml(rel.targetMultiplicity)}]</span>` : ''}
-          ${rel.label ? `<em class="pill-lbl">„${escapeHtml(rel.label)}“</em>` : ''}
+          ${rel.targetRole ? `<em class="pill-role">(${escapeHtml(rel.targetRole)})</em>` : ''}
         </button>
         <button type="button" class="relation-pill-del" title="Smazat vazbu" aria-label="Smazat vazbu">&times;</button>
       `;
@@ -1266,7 +1353,6 @@ export class UmlCanvasEditor {
           presetKey: getPresetKeyFromRelation(existingRelation),
           sourceMultiplicity: existingRelation.sourceMultiplicity || '',
           targetMultiplicity: existingRelation.targetMultiplicity || '',
-          label: existingRelation.label || '',
           sourceRole: existingRelation.sourceRole || '',
           targetRole: existingRelation.targetRole || ''
         }
@@ -1276,7 +1362,6 @@ export class UmlCanvasEditor {
           presetKey: 'association_uni',
           sourceMultiplicity: '1',
           targetMultiplicity: '0..*',
-          label: '',
           sourceRole: '',
           targetRole: ''
         };
@@ -1301,6 +1386,32 @@ export class UmlCanvasEditor {
         </label>
       `).join('');
 
+      let rolesSectionHtml = '';
+      if (activePreset.allowTargetRole && !activePreset.allowSourceRole) {
+        // Jednosměrně řiditelná vazba (asociace, agregace, kompozice): zobrazit a zvýraznit pouze Roli u cíle
+        rolesSectionHtml = `
+          <div class="form-group role-target-highlight">
+            <label for="rel-input-tgt-role">Role u cíle (${escapeHtml(tgtName)}) — odpovídá názvu referenčního atributu ve třídě ${escapeHtml(srcName)}:</label>
+            <input type="text" id="rel-input-tgt-role" class="input" value="${escapeHtml(draft.targetRole)}" placeholder="např. vozidla, polozky, styl">
+            <span class="role-field-hint">U jednosměrné řiditelnosti se role uvádí pouze na cílové straně (u otevřené šipky).</span>
+          </div>
+        `;
+      } else if (activePreset.allowSourceRole && activePreset.allowTargetRole) {
+        // Obousměrně řiditelná asociace (<──>): obě role
+        rolesSectionHtml = `
+          <div class="relation-row-2col">
+            <div class="form-group">
+              <label for="rel-input-src-role">Role u zdroje (${escapeHtml(srcName)}):</label>
+              <input type="text" id="rel-input-src-role" class="input" value="${escapeHtml(draft.sourceRole)}" placeholder="např. vlastnik">
+            </div>
+            <div class="form-group role-target-highlight">
+              <label for="rel-input-tgt-role">Role u cíle (${escapeHtml(tgtName)}):</label>
+              <input type="text" id="rel-input-tgt-role" class="input" value="${escapeHtml(draft.targetRole)}" placeholder="např. ucty">
+            </div>
+          </div>
+        `;
+      }
+
       this.modalBodyEl.innerHTML = `
         <div class="relation-endpoints-banner">
           <div class="endpoint-box">
@@ -1317,19 +1428,19 @@ export class UmlCanvasEditor {
         </div>
 
         <div class="form-group">
-          <label>Typ vazby podle UML 2.5:</label>
+          <label>Typ vazby a řiditelnost podle UML 2.5:</label>
           <div class="relation-type-grid">${presetCardsHtml}</div>
         </div>
 
         <div class="relation-row-2col" ${activePreset.allowMultiplicity ? '' : 'style="opacity:0.55;"'}>
           <div class="form-group">
-            <label for="rel-input-src-mult">Násobnost u zdroje (${escapeHtml(srcName)}):</label>
+            <label for="rel-input-src-mult">Multiplicita u zdroje (${escapeHtml(srcName)}):</label>
             <select id="rel-input-src-mult" class="input" ${activePreset.allowMultiplicity ? '' : 'disabled'}>
               ${multOptionsHtml(activePreset.allowMultiplicity ? draft.sourceMultiplicity : '')}
             </select>
           </div>
           <div class="form-group">
-            <label for="rel-input-tgt-mult">Násobnost u cíle (${escapeHtml(tgtName)}):</label>
+            <label for="rel-input-tgt-mult">Multiplicita u cíle (${escapeHtml(tgtName)}):</label>
             <select id="rel-input-tgt-mult" class="input" ${activePreset.allowMultiplicity ? '' : 'disabled'}>
               ${multOptionsHtml(activePreset.allowMultiplicity ? draft.targetMultiplicity : '')}
             </select>
@@ -1337,24 +1448,10 @@ export class UmlCanvasEditor {
         </div>
 
         ${!activePreset.allowMultiplicity
-          ? '<p class="rel-hint-note">Pro generalizaci a realizaci rozhraní se v UML 2.5 násobnost, popisek ani role neuvádějí.</p>'
+          ? '<p class="rel-hint-note">Pro generalizaci a realizaci rozhraní se v UML 2.5 multiplicita ani role neuvádějí.</p>'
           : ''}
 
-        <div class="form-group" ${activePreset.allowLabel === false ? 'style="opacity:0.55;"' : ''}>
-          <label for="rel-input-label">Popisek vazby (volitelné, např. <em>vlastní</em>, <em>eviduje</em>):</label>
-          <input type="text" id="rel-input-label" class="input" value="${escapeHtml(activePreset.allowLabel === false ? '' : draft.label)}" placeholder="např. vlastní" ${activePreset.allowLabel === false ? 'disabled' : ''}>
-        </div>
-
-        <div class="relation-row-2col" ${activePreset.allowRoles ? '' : 'style="opacity:0.55;"'}>
-          <div class="form-group">
-            <label for="rel-input-src-role">Role na straně zdroje (volitelné):</label>
-            <input type="text" id="rel-input-src-role" class="input" value="${escapeHtml(draft.sourceRole)}" placeholder="např. vlastnik" ${activePreset.allowRoles ? '' : 'disabled'}>
-          </div>
-          <div class="form-group">
-            <label for="rel-input-tgt-role">Role na straně cíle (volitelné):</label>
-            <input type="text" id="rel-input-tgt-role" class="input" value="${escapeHtml(draft.targetRole)}" placeholder="např. polozky" ${activePreset.allowRoles ? '' : 'disabled'}>
-          </div>
-        </div>
+        ${rolesSectionHtml}
       `;
 
       this.modalBodyEl.querySelectorAll('input[name="rel-preset"]').forEach((radio) => {
@@ -1364,11 +1461,12 @@ export class UmlCanvasEditor {
           if (!nextPreset.allowMultiplicity) {
             draft.sourceMultiplicity = '';
             draft.targetMultiplicity = '';
-            draft.sourceRole = '';
-            draft.targetRole = '';
           }
-          if (nextPreset.allowLabel === false) {
-            draft.label = '';
+          if (!nextPreset.allowSourceRole) {
+            draft.sourceRole = '';
+          }
+          if (!nextPreset.allowTargetRole) {
+            draft.targetRole = '';
           }
           renderForm();
         });
@@ -1377,7 +1475,11 @@ export class UmlCanvasEditor {
       this.modalBodyEl.querySelector('#btn-swap-direction')?.addEventListener('click', () => {
         [draft.sourceId, draft.targetId] = [draft.targetId, draft.sourceId];
         [draft.sourceMultiplicity, draft.targetMultiplicity] = [draft.targetMultiplicity, draft.sourceMultiplicity];
-        [draft.sourceRole, draft.targetRole] = [draft.targetRole, draft.sourceRole];
+        if (activePreset.allowSourceRole) {
+          [draft.sourceRole, draft.targetRole] = [draft.targetRole, draft.sourceRole];
+        } else {
+          draft.sourceRole = '';
+        }
         renderForm();
       });
 
@@ -1386,9 +1488,6 @@ export class UmlCanvasEditor {
       });
       this.modalBodyEl.querySelector('#rel-input-tgt-mult')?.addEventListener('change', (e) => {
         draft.targetMultiplicity = e.target.value;
-      });
-      this.modalBodyEl.querySelector('#rel-input-label')?.addEventListener('input', (e) => {
-        draft.label = e.target.value;
       });
       this.modalBodyEl.querySelector('#rel-input-src-role')?.addEventListener('input', (e) => {
         draft.sourceRole = e.target.value;
@@ -1424,9 +1523,9 @@ export class UmlCanvasEditor {
         targetId: draft.targetId,
         sourceMultiplicity: preset.allowMultiplicity ? (draft.sourceMultiplicity || null) : null,
         targetMultiplicity: preset.allowMultiplicity ? (draft.targetMultiplicity || null) : null,
-        label: preset.allowLabel === false ? '' : draft.label.trim(),
-        sourceRole: preset.allowRoles ? draft.sourceRole.trim() : '',
-        targetRole: preset.allowRoles ? draft.targetRole.trim() : ''
+        label: '',
+        sourceRole: preset.allowSourceRole ? draft.sourceRole.trim() : '',
+        targetRole: preset.allowTargetRole ? draft.targetRole.trim() : ''
       };
 
       this.saveRelation(payload, isEdit ? existingRelation.id : null);
