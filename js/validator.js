@@ -1,5 +1,5 @@
 /**
- * Deterministický validátor návrhových diagramů tříd podle UML 2.5.
+ * Deterministický validátor návrhových diagramů tříd podle UML 2.5 (konvence UOMO).
  * - Provádí optimální párování vazeb a počítá každou dílčí chybu na vazbě samostatně.
  * - Počítá XP podle pravidla „svobody selhat“ (1 drobná chyba v kompletním diagramu = 100 XP, 11+ chyb = 45 XP).
  * - Ošetřuje prázdné plátno (passed: false, 0 XP, 0 ★ – neodemkne další krok).
@@ -9,8 +9,8 @@
 export const XP_BY_ERRORS = [100, 100, 90, 81, 73, 66, 60, 55, 51, 48, 46, 45];
 
 const RELATION_TYPE_NAMES = {
-  association_bi: 'obousměrnou prostou asociaci (plná čára bez šipek)',
-  association_uni: 'jednosměrnou prostou asociaci (plná čára s otevřenou šipkou)',
+  association_bi: 'obousměrnou asociaci (<-->)',
+  association_uni: 'jednosměrnou řiditelnou asociaci (plná čára s otevřenou šipkou)',
   aggregation: 'agregaci (prázdný kosočtverec u celku a otevřená šipka k části)',
   composition: 'kompozici (plný kosočtverec u celku a otevřená šipka k části)',
   generalization: 'generalizaci / dědičnost (plná čára s prázdným trojúhelníkem k rodiči)',
@@ -113,10 +113,10 @@ function describeTypeMismatch(expRel, actRel, srcName, tgtName) {
     return `Mezi ${srcName} a nadtřídou ${tgtName} jsi použil/a realizaci (přerušovaná čára). Dědičnost mezi třídami se značí generalizací (plná čára s prázdným trojúhelníkem).`;
   }
   if (expKind === 'association_uni' && actKind === 'association_bi') {
-    return `Vazba mezi ${srcName} a ${tgtName} je nastavena jako obousměrná, ale zadání vyžaduje jednosměrnou navigovatelnost směrem od ${srcName} k ${tgtName} (otevřená šipka na cíli).`;
+    return `V návrhovém modelu v UOMO se obousměrné asociace (<-->) nepoužívají – vazba mezi ${srcName} a ${tgtName} musí mít jednosměrnou řiditelnost směrem od ${srcName} k ${tgtName} (otevřená šipka na cíli).`;
   }
   if (expKind === 'association_bi' && actKind === 'association_uni') {
-    return `Vazba mezi ${srcName} a ${tgtName} má nastavenou jednosměrnou šipku, ale podle zadání má být obousměrnou prostou asociací (plná čára bez šipek).`;
+    return `Vazba mezi ${srcName} a ${tgtName} má nastavenou jednosměrnou šipku, ale podle zadání má být obousměrnou asociací (<-->).`;
   }
 
   const expLabel = RELATION_TYPE_NAMES[expKind] || expKind;
@@ -139,7 +139,7 @@ function describeDirectionMismatch(expRel, srcName, tgtName) {
     const diamondName = expRel.type === 'composition' ? 'plný kosočtverec' : 'prázdný kosočtverec';
     return `Vazba mezi ${srcName} a ${tgtName} má obrácený směr – ${diamondName} musí být na straně celku (${srcName}) a otevřená šipka musí směřovat k části (${tgtName}).`;
   }
-  return `Jednosměrná asociace mezi ${srcName} a ${tgtName} má obrácený směr – otevřená šipka navigovatelnosti má směřovat od ${srcName} k ${tgtName}.`;
+  return `Jednosměrná asociace mezi ${srcName} a ${tgtName} má obrácený směr – otevřená šipka řiditelnosti má směřovat od ${srcName} k ${tgtName}.`;
 }
 
 function describeMultiplicityMismatch(expRel, side, className, srcName, tgtName, actualMult) {
@@ -152,9 +152,9 @@ function describeMultiplicityMismatch(expRel, side, className, srcName, tgtName,
 
   const stateHint = actualMult
     ? `aktuálně nastaveno „${actualMult}“`
-    : 'násobnost není vyplněna';
+    : 'multiplicita není vyplněna';
 
-  return `U vazby ${srcName} – ${tgtName} zkontroluj násobnost na straně třídy ${className} (${stateHint}). Ověř v zadání minimální a maximální počet souvisejících instancí.`;
+  return `U vazby ${srcName} – ${tgtName} zkontroluj multiplicitu na straně třídy ${className} (${stateHint}). Ověř v zadání minimální a maximální počet souvisejících instancí.`;
 }
 
 function describeRoleMismatch(expRel, side, className, srcName, tgtName) {
@@ -164,7 +164,10 @@ function describeRoleMismatch(expRel, side, className, srcName, tgtName) {
   if (side === 'target' && expRel.feedback?.wrongTargetRole) {
     return expRel.feedback.wrongTargetRole;
   }
-  return `U vazby ${srcName} – ${tgtName} zkontroluj požadovaný název role na straně třídy ${className}.`;
+  if (side === 'target') {
+    return `U vazby ${srcName} → ${tgtName} doplň na straně ${className} název role odpovídající referenčnímu atributu ve třídě ${srcName}.`;
+  }
+  return `U vazby ${srcName} – ${tgtName} doplň na straně ${className} název role odpovídající referenčnímu atributu ve třídě ${tgtName}.`;
 }
 
 function evaluateRelationCandidate(expRel, actRel, subchapter) {
@@ -206,7 +209,7 @@ function evaluateRelationCandidate(expRel, actRel, subchapter) {
     if (actMultAtExpectedSrc || actMultAtExpectedTgt) {
       const kindCz = expRel.type === 'generalization' ? 'generalizace (dědičnosti)' : 'realizace rozhraní';
       issues.push(
-        `Na vazbě ${kindCz} mezi ${srcName} a ${tgtName} máš nastavenou násobnost. V UML 2.5 se u ${kindCz} násobnosti neuvádějí – odeber je.`
+        `Na vazbě ${kindCz} mezi ${srcName} a ${tgtName} máš nastavenou multiplicitu. V UML 2.5 se u ${kindCz} multiplicity neuvádějí – odeber je.`
       );
     }
   } else {
