@@ -915,15 +915,6 @@ h1, h2, h3, h4, p {
   color: var(--color-success);
 }
 
-.palette-drag-ghost {
-  position: fixed;
-  z-index: 200;
-  pointer-events: none;
-  opacity: 0.92;
-  transform: scale(0.98);
-  box-shadow: var(--shadow-lg);
-}
-
 .canvas-column {
   display: flex;
   flex-direction: column;
@@ -987,6 +978,16 @@ h1, h2, h3, h4, p {
   touch-action: none;
   z-index: 5;
   transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+/* Přesunuto za .uml-class-box s vyšší specificitou – garantuje position: fixed při scrollování */
+.uml-class-box.palette-drag-ghost {
+  position: fixed;
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0.92;
+  transform: scale(0.98);
+  box-shadow: var(--shadow-lg);
 }
 
 .uml-class-box.interactive {
@@ -1461,6 +1462,29 @@ h1, h2, h3, h4, p {
   margin: -0.45rem 0 0.9rem;
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+.pill-role {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.role-target-highlight {
+  background: var(--color-accent-soft);
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.85rem;
+}
+
+.role-target-highlight label {
+  color: var(--color-primary-dark);
+}
+
+.role-field-hint {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
 }
 
 /* Odznaky a zpětná vazba */
