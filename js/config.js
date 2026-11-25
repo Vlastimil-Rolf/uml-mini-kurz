@@ -116,8 +116,8 @@ export const MASTER_STORY = {
   chapterIntros: {
     teorie: 'V teoretické síni si osvojíš sedm základních kamenů UML 2.5. Jakmile projdeš všemi sedmi zkouškami, odemknou se ti tři praktické domény.',
     'ch-autoservis': 'Vítej v Autoservisu! Čeká tě čtyřkrokový rozvoj modelu od evidence vozidel až po zakázky a fakturaci. Každý krok navazuje na tvé předchozí plátno.',
-    'ch-banka': 'Vstupuješ do Banky – domény, kde na přesnosti násobností a kompozic záleží každá transakce. Stavěj model krok za krokem.',
-'ch-geometrie': 'Vítej v ateliéru Geometrie (Malování)! Tady prověříš kompozice vrstev, agregaci palet, abstraktní třídy a dědičnost na vektorových tvarech.'
+    'ch-banka': 'Vstupuješ do Banky – domény, kde na přesnosti multiplicit a kompozic záleží každá transakce. Stavěj model krok za krokem.',
+    'ch-geometrie': 'Vítej v ateliéru Geometrie (Malování)! Tady prověříš kompozice vrstev, agregaci palet, abstraktní třídy a dědičnost na vektorových tvarech.'
   },
   inheritedCanvasNote: 'Tvé předchozí plátno jsem přenesl do nového kroku a aktualizoval třídy o čerstvé atributy a operace.',
   levelUpPraise: (level, rank) => `Výborně! Postupuješ na úroveň ${level} a cech ti uděluje hodnost „${rank}“.`,
