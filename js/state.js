@@ -3,18 +3,42 @@
  * - XP (přírůstek xpDelta při opakování), exponenciální levely, hvězdy, pokusy
  * - Režim progrese (sequential vs. open) a pravidla odemykání kapitol
  * - Odznaky kapitol (všechny podkapitoly na >= 2 hvězdy)
+ * - Neměnné sessionId, původní initialStudentId, neomezovaná historie přejmenování (nameHistory)
  * - Anti-cheat auditní log s časovou osou pokusů a dobou řešení
  */
 import { APP_CONFIG, CHAPTER_BADGES, getLevelInfo } from './config.js';
 import { calculateStars } from './validator.js';
 
+function generateSessionId() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const randomBlock = (length) => {
+    let out = '';
+    if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+      const bytes = new Uint8Array(length);
+      crypto.getRandomValues(bytes);
+      for (let i = 0; i < length; i++) {
+        out += alphabet[bytes[i] % alphabet.length];
+      }
+      return out;
+    }
+    for (let i = 0; i < length; i++) {
+      out += alphabet[Math.floor(Math.random() * alphabet.length)];
+    }
+    return out;
+  };
+  return `UML-${randomBlock(4)}-${randomBlock(4)}`;
+}
+
 function createInitialState() {
   const now = new Date().toISOString();
   return {
     version: APP_CONFIG.version,
+    sessionId: generateSessionId(),
     createdAt: now,
     updatedAt: now,
     studentId: '',
+    initialStudentId: '',
+    nameHistory: [], // Pole objektů { ts, from, to } – nikdy se neořezává
     onboardingSeen: false,
     progressionMode: 'sequential', // 'sequential' | 'open'
     everUsedOpenMode: false,
@@ -48,11 +72,34 @@ export function loadState() {
       };
     }
 
-    return {
-      ...createInitialState(),
+    const base = createInitialState();
+    const currentStudentId = String(parsed.studentId || '').trim();
+    const needsSessionIdMigration = !parsed.sessionId || typeof parsed.sessionId !== 'string';
+    const needsInitialStudentMigration = parsed.initialStudentId === undefined;
+    const needsNameHistoryMigration = !Array.isArray(parsed.nameHistory);
+
+    const loaded = {
+      ...base,
       ...parsed,
+      sessionId: needsSessionIdMigration ? base.sessionId : parsed.sessionId,
+      studentId: currentStudentId,
+      initialStudentId: needsInitialStudentMigration
+        ? currentStudentId
+        : String(parsed.initialStudentId || '').trim(),
+      nameHistory: needsNameHistoryMigration ? [] : parsed.nameHistory,
       subchapters: migratedSubchapters
     };
+
+    // U starších profilů jednorázově dogeneruje a uloží sessionId (a doplněná pole)
+    if (needsSessionIdMigration || needsInitialStudentMigration || needsNameHistoryMigration) {
+      try {
+        localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(loaded));
+      } catch (persistErr) {
+        console.warn('Nepodařilo se uložit migrovaný stav do localStorage:', persistErr);
+      }
+    }
+
+    return loaded;
   } catch (err) {
     console.warn('Nepodařilo se načíst stav z localStorage, zakládám čistý profil:', err);
     return createInitialState();
@@ -76,16 +123,59 @@ export function completeOnboarding(studentName = '') {
   state.onboardingSeen = true;
   const trimmed = String(studentName || '').trim();
   if (trimmed) {
+    if (!state.initialStudentId) {
+      state.initialStudentId = trimmed;
+    }
     state.studentId = trimmed;
   }
-  appendSystemAuditEvent('ONBOARDING_DONE', trimmed ? `Učedník: ${trimmed}` : 'Bez zadané přezdívky');
+  appendSystemAuditEvent('ONBOARDING_DONE', trimmed ? `Učedník: ${trimmed}` : 'Bez zadaného jména');
   saveState();
 }
 
 export function setStudentId(studentId) {
-  state.studentId = String(studentId || '').trim();
-  appendSystemAuditEvent('SET_STUDENT_ID', state.studentId || '(prázdné)');
+  const next = String(studentId || '').trim();
+  const prev = String(state.studentId || '').trim();
+
+  if (!Array.isArray(state.nameHistory)) {
+    state.nameHistory = [];
+  }
+
+  // Pokud je přejmenování zakázáno a původní jméno už bylo jednou nastaveno, změnu ignoruj
+  if (APP_CONFIG.allowStudentRename === false && state.initialStudentId) {
+    return { changed: false, locked: true, studentId: state.studentId };
+  }
+
+  if (next === prev) {
+    if (!state.initialStudentId && next) {
+      state.initialStudentId = next;
+      saveState();
+    }
+    return { changed: false, locked: false, studentId: state.studentId };
+  }
+
+  const hadInitialName = Boolean(state.initialStudentId);
+  if (!hadInitialName && next) {
+    state.initialStudentId = next;
+  }
+
+  state.studentId = next;
+
+  if (hadInitialName) {
+    state.nameHistory.push({
+      ts: new Date().toISOString(),
+      from: prev,
+      to: next
+    });
+    appendSystemAuditEvent(
+      'SET_STUDENT_ID',
+      `Změna jména: ${prev || '(prázdné)'} → ${next || '(prázdné)'}`
+    );
+  } else {
+    appendSystemAuditEvent('SET_STUDENT_ID', next || '(prázdné)');
+  }
+
   saveState();
+  return { changed: true, locked: false, studentId: state.studentId };
 }
 
 export function appendSystemAuditEvent(type, details = '') {
@@ -166,17 +256,68 @@ export function getCanvasDraft(subchapterId) {
 }
 
 /**
+ * Zaznamená průběžnou kontrolu diagramu s chybami:
+ * - Neukládá splnění ani XP a neodemkne další krok
+ * - Navýší počítadlo pokusů (attempts) a zapíše událost VALIDATION_CHECK pro telemetrii a auditní log
+ */
+export function recordValidationCheck(subchapter, validationResult, canvasData, durationSec = 0) {
+  if (!validationResult || validationResult.passed === false || validationResult.isEmptyCanvas) {
+    return null;
+  }
+
+  const now = new Date().toISOString();
+  const prev = getSubchapterProgress(subchapter.id);
+  const attempts = prev.attempts + 1;
+
+  state.subchapters[subchapter.id] = {
+    ...prev,
+    attempts,
+    lastAttemptAt: now,
+    savedCanvas: canvasData
+  };
+
+  const levelInfo = getLevelInfo(state.xp);
+  const auditEntry = {
+    ts: now,
+    type: 'VALIDATION_CHECK',
+    subchapterId: subchapter.id,
+    errors: validationResult.errors,
+    xp: validationResult.xp,
+    xpDelta: 0,
+    totalXp: state.xp,
+    level: levelInfo.level,
+    progressionMode: state.progressionMode,
+    attempts,
+    durationSec: Math.max(0, Math.round(durationSec))
+  };
+
+  state.auditLog.push(auditEntry);
+  trimAuditLog();
+  saveState();
+
+  return {
+    attempts,
+    auditEntry
+  };
+}
+
+/**
  * Čistý (bez mutace stavu) náhled dopadu případného potvrzení výsledku.
  * Používá se při kontrole diagramu s chybami, než student výsledek skutečně potvrdí a uloží.
  */
-export function previewSubchapterCompletion(subchapter, validationResult, allChapters) {
+export function previewSubchapterCompletion(
+  subchapter,
+  validationResult,
+  allChapters,
+  { incrementAttempt = true } = {}
+) {
   const prev = getSubchapterProgress(subchapter.id);
   const previousBestXp = prev.bestXp || 0;
   const currentXp = validationResult.passed ? validationResult.xp : 0;
   const xpDelta = validationResult.passed ? Math.max(0, currentXp - previousBestXp) : 0;
   const newBestXp = validationResult.passed ? Math.max(previousBestXp, currentXp) : previousBestXp;
   const newStars = validationResult.passed ? calculateStars(newBestXp) : prev.stars;
-  const attempts = prev.attempts + 1;
+  const attempts = incrementAttempt ? prev.attempts + 1 : Math.max(1, prev.attempts);
 
   const prevLevelInfo = getLevelInfo(state.xp);
   const newLevelInfo = getLevelInfo(state.xp + xpDelta);
@@ -226,7 +367,14 @@ export function previewSubchapterCompletion(subchapter, validationResult, allCha
  * - Vytvoří detailní anti-cheat záznam (včetně doby řešení v sekundách)
  * - Zkontroluje odemčení nových kapitolních odznaků a postupu na vyšší úroveň
  */
-export function recordSubchapterCompletion(subchapter, validationResult, canvasData, allChapters, durationSec = 0) {
+export function recordSubchapterCompletion(
+  subchapter,
+  validationResult,
+  canvasData,
+  allChapters,
+  durationSec = 0,
+  { incrementAttempt = true } = {}
+) {
   if (!validationResult || validationResult.passed === false || validationResult.isEmptyCanvas) {
     return null;
   }
@@ -239,7 +387,7 @@ export function recordSubchapterCompletion(subchapter, validationResult, canvasD
   const xpDelta = Math.max(0, currentXp - previousBestXp);
   const newBestXp = Math.max(previousBestXp, currentXp);
   const newStars = calculateStars(newBestXp);
-  const attempts = prev.attempts + 1;
+  const attempts = incrementAttempt ? prev.attempts + 1 : Math.max(1, prev.attempts);
 
   const prevLevelInfo = getLevelInfo(state.xp);
   const prevBadges = new Set(state.badges);
@@ -369,6 +517,7 @@ export function isSubchapterUnlocked(subchapter, allChapters, { assumeCompletedI
 
 /**
  * Obnoví stav z ověřeného Base64 certifikátu a přepočítá XP i odznaky pro zajištění konzistence.
+ * Původní identitní pole (sessionId, createdAt, initialStudentId, nameHistory) přebírá beze změny.
  */
 export function importStateFromObject(importedData, allChapters) {
   const base = createInitialState();
@@ -396,9 +545,24 @@ export function importStateFromObject(importedData, allChapters) {
     }
   }
 
+  const importedStudentId = String(importedData.studentId || '').trim();
+  const importedInitialStudentId = importedData.initialStudentId !== undefined
+    ? String(importedData.initialStudentId || '').trim()
+    : importedStudentId;
+  const importedNameHistory = Array.isArray(importedData.nameHistory)
+    ? importedData.nameHistory.map((item) => ({
+        ts: item.ts || '',
+        from: String(item.from ?? ''),
+        to: String(item.to ?? '')
+      }))
+    : [];
+
   state = {
     ...base,
-    studentId: String(importedData.studentId || ''),
+    sessionId: importedData.sessionId ? String(importedData.sessionId) : base.sessionId,
+    studentId: importedStudentId,
+    initialStudentId: importedInitialStudentId,
+    nameHistory: importedNameHistory,
     onboardingSeen: true,
     createdAt: importedData.createdAt || base.createdAt,
     progressionMode: importedData.progressionMode === 'open' ? 'open' : 'sequential',
