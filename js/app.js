@@ -3,7 +3,7 @@
  * Propojuje data kapitol, exponenciální gamifikaci, větvenou progresi, příběh Mistra,
  * vizuální ukazatel postupu v kapitole, UML 2.5 editor, deterministický validátor a telemetrii.
  */
-import { CHAPTER_BADGES, MASTER_STORY, getLevelInfo } from './config.js';
+import { APP_CONFIG, CHAPTER_BADGES, MASTER_STORY, getLevelInfo } from './config.js';
 import {
   getState,
   completeOnboarding,
@@ -12,6 +12,7 @@ import {
   getSubchapterProgress,
   saveCanvasDraft,
   getCanvasDraft,
+  recordValidationCheck,
   previewSubchapterCompletion,
   recordSubchapterCompletion,
   isChapterMastered,
@@ -88,6 +89,9 @@ const dom = {
 
   modalCert: document.getElementById('modal-cert'),
   inputStudentId: document.getElementById('input-student-id'),
+  saveStudentIdBtn: document.getElementById('btn-save-student-id'),
+  certSessionNote: document.getElementById('cert-session-note'),
+  studentIdLockNote: document.getElementById('student-id-lock-note'),
   textareaCertExport: document.getElementById('textarea-cert-export'),
   textareaCertImport: document.getElementById('textarea-cert-import'),
   certStatusMsg: document.getElementById('cert-status-msg'),
@@ -104,6 +108,20 @@ function escapeHtml(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+function formatTimestampCs(isoString) {
+  if (!isoString) return '—';
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return String(isoString);
+  return date.toLocaleString('cs-CZ', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
 }
 
 function deepCloneCanvas(canvasData) {
@@ -333,7 +351,9 @@ function loadSubchapter(subchapterId, { forceResetToDefault = false } = {}) {
   dom.breadcrumb.textContent = `${sub.type === 'theory' ? 'Teoretická část' : 'Praktická část'} / ${chapter.title}`;
   dom.subTitle.textContent = sub.title;
   dom.subStars.textContent = renderStarsText(prog.stars);
-  dom.subScore.textContent = prog.attempts > 0 ? `Nejlepší výsledek: ${prog.bestXp} XP` : 'Nejlepší výsledek: —';
+  dom.subScore.textContent = prog.completed
+    ? `Nejlepší výsledek: ${prog.bestXp} XP`
+    : 'Nejlepší výsledek: —';
 
   if (sub.type === 'theory' && sub.theoryContent) {
     dom.theorySection.hidden = false;
@@ -393,13 +413,14 @@ function loadSubchapter(subchapterId, { forceResetToDefault = false } = {}) {
 /**
  * Závazně uloží výsledek do stavu, odešle telemetrii a aktualizuje rozhraní.
  */
-function commitValidation({ subchapter, result, diagramState, durationSec }) {
+function commitValidation({ subchapter, result, diagramState, durationSec, incrementAttempt = true }) {
   const outcome = recordSubchapterCompletion(
     subchapter,
     result,
     diagramState,
     ALL_CHAPTERS,
-    durationSec
+    durationSec,
+    { incrementAttempt }
   );
   if (!outcome) return null;
 
@@ -462,11 +483,30 @@ function handleValidation() {
   let outcome;
 
   if (isDeferredConfirmation) {
-    pendingValidation = { subchapter: activeSubchapter, result, diagramState, durationSec };
-    outcome = previewSubchapterCompletion(activeSubchapter, result, ALL_CHAPTERS);
+    const checkOutcome = recordValidationCheck(activeSubchapter, result, diagramState, durationSec);
+    if (checkOutcome) {
+      const updatedState = getState();
+      const freshCertificate = generateBase64Certificate(updatedState, { includeCanvases: false });
+      sendTelemetryEvent(updatedState, checkOutcome.auditEntry, freshCertificate);
+    }
+
+    pendingValidation = {
+      subchapter: activeSubchapter,
+      result,
+      diagramState,
+      durationSec,
+      incrementAttempt: false
+    };
+    outcome = previewSubchapterCompletion(activeSubchapter, result, ALL_CHAPTERS, { incrementAttempt: false });
   } else {
     pendingValidation = null;
-    outcome = commitValidation({ subchapter: activeSubchapter, result, diagramState, durationSec });
+    outcome = commitValidation({
+      subchapter: activeSubchapter,
+      result,
+      diagramState,
+      durationSec,
+      incrementAttempt: true
+    });
   }
 
   let masterComment = MASTER_STORY.passedPerfect;
@@ -560,7 +600,7 @@ function handleValidation() {
       </div>
       <div style="text-align:right;">
         <div style="font-size:1.35rem;color:#d97706;">${renderStarsText(result.stars)}</div>
-        <div style="font-size:0.78rem;color:#475569;">${isDeferredConfirmation ? `Bude pokus #${outcome.attempts}` : `Pokus #${outcome.attempts}`} · ${durationSec} s</div>
+        <div style="font-size:0.78rem;color:#475569;">Pokus #${outcome.attempts} · ${durationSec} s</div>
       </div>
     </div>
     <p style="font-style:italic;margin-bottom:0.85rem;">„${escapeHtml(masterComment)}“</p>
@@ -650,9 +690,31 @@ function renderBadgesModal() {
   }).join('');
 }
 
+function syncCertIdentityControls(state) {
+  if (dom.certSessionNote) {
+    dom.certSessionNote.textContent = `Neměnné ID relace: ${state.sessionId || '—'} (součást podepsaného certifikátu)`;
+  }
+
+  const renameLocked = APP_CONFIG.allowStudentRename === false && Boolean(state.initialStudentId);
+
+  if (dom.inputStudentId) {
+    dom.inputStudentId.disabled = renameLocked;
+  }
+  if (dom.saveStudentIdBtn) {
+    dom.saveStudentIdBtn.disabled = renameLocked;
+  }
+  if (dom.studentIdLockNote) {
+    dom.studentIdLockNote.hidden = !renameLocked;
+    dom.studentIdLockNote.textContent = renameLocked
+      ? 'Přejmenování je v této konfiguraci po prvním zadání jména uzamčeno.'
+      : '';
+  }
+}
+
 function openCertModal() {
   const state = getState();
   dom.inputStudentId.value = state.studentId || '';
+  syncCertIdentityControls(state);
   dom.textareaCertExport.value = generateBase64Certificate(state);
   dom.textareaCertImport.value = '';
   dom.certStatusMsg.textContent = '';
@@ -682,6 +744,55 @@ function runInstructorVerifier() {
   const p = verification.payload;
   const levelInfo = getLevelInfo(p.xp || 0);
 
+  const sessionIdDisplay = p.sessionId
+    ? `<code>${escapeHtml(p.sessionId)}</code>`
+    : '<span style="color:#64748b;">(starší certifikát bez ID relace)</span>';
+  const createdAtDisplay = formatTimestampCs(p.createdAt);
+  const currentName = String(p.studentId || '').trim();
+  const hasInitialField = typeof p.initialStudentId === 'string';
+  const initialName = hasInitialField ? p.initialStudentId.trim() : '';
+  const initialNameDisplay = hasInitialField
+    ? (initialName ? escapeHtml(initialName) : '(neuvedeno)')
+    : '<span style="color:#64748b;">(nezaznamenáno – starší certifikát)</span>';
+
+  const nameHistory = Array.isArray(p.nameHistory) ? p.nameHistory : [];
+  const hasNameChange = nameHistory.length > 0 || (hasInitialField && initialName !== currentName);
+
+  const renameWarningHtml = hasNameChange
+    ? `
+      <div style="margin-top:0.65rem;padding:0.7rem 0.85rem;background:#fff7ed;border:1.5px solid #f97316;border-left:5px solid #ea580c;border-radius:6px;color:#9a3412;">
+        <strong>⚠️ Upozornění: V profilu došlo ke změně jména (${nameHistory.length > 0 ? `${nameHistory.length}×` : 'neshoda původního a aktuálního jména'})</strong>
+        ${
+          nameHistory.length > 0
+            ? `<ul style="margin:0.4rem 0 0;padding-left:1.15rem;font-size:0.8rem;">
+                ${nameHistory
+                  .map(
+                    (h) =>
+                      `<li><code>${escapeHtml(formatTimestampCs(h.ts))}</code> — <strong>${escapeHtml(h.from || '(prázdné)')}</strong> → <strong>${escapeHtml(h.to || '(prázdné)')}</strong></li>`
+                  )
+                  .join('')}
+              </ul>`
+            : `<div style="margin-top:0.35rem;font-size:0.8rem;">Původní jméno „${escapeHtml(initialName || '(prázdné)')}“ se liší od aktuálního jména „${escapeHtml(currentName || '(prázdné)')}“.</div>`
+        }
+      </div>
+    `
+    : '';
+
+  const antiCheatHeaderHtml = `
+    <div style="margin:0.55rem 0 0.75rem;padding:0.75rem 0.9rem;background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;">
+      <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;color:#1e3a5f;margin-bottom:0.4rem;">
+        Identita relace a anti-cheat kontrola
+      </div>
+      <div><strong>ID relace:</strong> ${sessionIdDisplay} | <strong>Vytvořeno:</strong> ${escapeHtml(createdAtDisplay)}</div>
+      <div style="margin-top:0.2rem;">
+        <strong>Aktuální jméno:</strong> ${escapeHtml(currentName || '(neuvedeno)')}
+        &nbsp;|&nbsp;
+        <strong>Původní (první) jméno:</strong> ${initialNameDisplay}
+      </div>
+      ${renameWarningHtml}
+    </div>
+  `;
+
   const chapterRows = ALL_CHAPTERS.map((ch) => {
     const subs = ch.subchapters.map((s) => p.subchapters?.[s.id]);
     const doneCount = subs.filter((s) => s?.completed).length;
@@ -704,7 +815,7 @@ function runInstructorVerifier() {
 
   const subRows = ORDERED_SUBCHAPTERS.map((sub) => {
     const sp = p.subchapters?.[sub.id];
-    const bestXp = sp ? (sp.bestXp ?? sp.bestScore ?? 0) : null;
+    const bestXp = sp && sp.completed ? (sp.bestXp ?? sp.bestScore ?? 0) : null;
     return `
       <tr>
         <td>${escapeHtml(sub.shortTitle)}</td>
@@ -723,6 +834,9 @@ function runInstructorVerifier() {
       if (entry.type === 'SUBCHAPTER_COMPLETE') {
         return `<li><code>${ts}</code> — <strong>${escapeHtml(entry.subchapterId)}</strong>: ${entry.errors} chyb, ${entry.xp} XP (+${entry.xpDelta} XP, celkem ${entry.totalXp} XP, lvl ${entry.level}), pokus #${entry.attempts}, čas ${entry.durationSec} s [${escapeHtml(entry.progressionMode)}]</li>`;
       }
+      if (entry.type === 'VALIDATION_CHECK') {
+        return `<li><code>${ts}</code> — [KONTROLA] <strong>${escapeHtml(entry.subchapterId)}</strong>: ${entry.errors} chyb, náhled ${entry.xp} XP (nepotvrzeno), pokus #${entry.attempts}, čas ${entry.durationSec} s [${escapeHtml(entry.progressionMode)}]</li>`;
+      }
       return `<li><code>${ts}</code> — [${escapeHtml(entry.type || 'EVENT')}] ${escapeHtml(entry.details || '')}</li>`;
     })
     .join('');
@@ -732,8 +846,9 @@ function runInstructorVerifier() {
       ✓ Podpis integrity certifikátu ověřen (hash: <code>${escapeHtml(verification.signature)}</code>)
       ${verification.xpConsistent ? '' : ' <span style="color:#d97706;">⚠️ Zjištěna odchylka součtu XP!</span>'}
     </div>
-    <div><strong>Student:</strong> ${escapeHtml(p.studentId || '(neuvedeno)')} | <strong>Celkem XP:</strong> ${p.xp} / ${levelInfo.maxCourseXp} (Úroveň ${levelInfo.level} – ${escapeHtml(levelInfo.rank)})</div>
-    <div><strong>Režim progrese:</strong> ${p.everUsedOpenMode ? '⚠️ Byl použit Volný průchod (open)' : '✓ Čistě Řízená cesta (sequential)'} | <strong>Vygenerováno:</strong> ${escapeHtml(verification.generatedAt)}</div>
+    ${antiCheatHeaderHtml}
+    <div><strong>Celkem XP:</strong> ${p.xp} / ${levelInfo.maxCourseXp} (Úroveň ${levelInfo.level} – ${escapeHtml(levelInfo.rank)})</div>
+    <div><strong>Režim progrese:</strong> ${p.everUsedOpenMode ? '⚠️ Byl použit Volný průchod (open)' : '✓ Čistě Řízená cesta (sequential)'} | <strong>Vygenerováno:</strong> ${escapeHtml(formatTimestampCs(verification.generatedAt))}</div>
 
     <h4 style="margin:0.85rem 0 0.35rem;font-size:0.88rem;">Přehled kapitol a odznaků</h4>
     <table class="verifier-table">
@@ -849,10 +964,21 @@ function bindGlobalEvents() {
     openModal(dom.modalVerifier);
   });
 
-  document.getElementById('btn-save-student-id')?.addEventListener('click', () => {
-    setStudentId(dom.inputStudentId.value);
-    dom.textareaCertExport.value = generateBase64Certificate(getState());
-    dom.certStatusMsg.textContent = 'Jméno / ID uloženo a Base64 certifikát aktualizován.';
+  dom.saveStudentIdBtn?.addEventListener('click', () => {
+    const result = setStudentId(dom.inputStudentId.value);
+    const updatedState = getState();
+    syncCertIdentityControls(updatedState);
+
+    if (result?.locked) {
+      dom.inputStudentId.value = updatedState.studentId || '';
+      dom.certStatusMsg.textContent = 'Přejmenování je uzamčeno – původní jméno zůstává zachováno.';
+      return;
+    }
+
+    dom.textareaCertExport.value = generateBase64Certificate(updatedState);
+    dom.certStatusMsg.textContent = result?.changed
+      ? 'Jméno / ID uloženo a Base64 certifikát aktualizován.'
+      : 'Jméno / ID zůstalo beze změny.';
   });
 
   document.getElementById('btn-copy-cert')?.addEventListener('click', async () => {
@@ -873,13 +999,16 @@ function bindGlobalEvents() {
       return;
     }
     importStateFromObject(verification.payload, ALL_CHAPTERS);
+    const restoredState = getState();
     renderTopbar();
     renderNavTree();
     const targetSubId = isSubchapterUnlocked(activeSubchapter, ALL_CHAPTERS)
       ? activeSubchapter.id
       : ORDERED_SUBCHAPTERS[0].id;
     loadSubchapter(targetSubId);
-    dom.textareaCertExport.value = generateBase64Certificate(getState());
+    dom.inputStudentId.value = restoredState.studentId || '';
+    syncCertIdentityControls(restoredState);
+    dom.textareaCertExport.value = generateBase64Certificate(restoredState);
     dom.certStatusMsg.textContent = 'Postup byl úspěšně ověřen a obnoven ze zálohy.';
   });
 
