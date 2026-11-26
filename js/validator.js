@@ -10,9 +10,9 @@ export const XP_BY_ERRORS = [100, 100, 90, 81, 73, 66, 60, 55, 51, 48, 46, 45];
 
 const RELATION_TYPE_NAMES = {
   association_bi: 'obousměrnou asociaci (<-->)',
-  association_uni: 'jednosměrnou řiditelnou asociaci (plná čára s otevřenou šipkou)',
-  aggregation: 'agregaci (prázdný kosočtverec u celku a otevřená šipka k části)',
-  composition: 'kompozici (plný kosočtverec u celku a otevřená šipka k části)',
+  association_uni: 'asociaci se šipkou (řiditelnou)',
+  aggregation: 'agregaci (prázdný kosočtverec u celku a šipka k části)',
+  composition: 'kompozici (plný kosočtverec u celku a šipka k části)',
   generalization: 'generalizaci / dědičnost (plná čára s prázdným trojúhelníkem k rodiči)',
   realization: 'realizaci rozhraní (přerušovaná čára s prázdným trojúhelníkem k rozhraní)'
 };
@@ -113,10 +113,10 @@ function describeTypeMismatch(expRel, actRel, srcName, tgtName) {
     return `Mezi ${srcName} a nadtřídou ${tgtName} jsi použil/a realizaci (přerušovaná čára). Dědičnost mezi třídami se značí generalizací (plná čára s prázdným trojúhelníkem).`;
   }
   if (expKind === 'association_uni' && actKind === 'association_bi') {
-    return `V návrhovém modelu v UOMO se obousměrné asociace (<-->) nepoužívají – vazba mezi ${srcName} a ${tgtName} musí mít jednosměrnou řiditelnost směrem od ${srcName} k ${tgtName} (otevřená šipka na cíli).`;
+    return `V návrhovém modelu v UOMO se obousměrné asociace (<-->) nepoužívají – vazba mezi ${srcName} a ${tgtName} má být asociací směrem z ${srcName} na ${tgtName} (šipka na cíli).`;
   }
   if (expKind === 'association_bi' && actKind === 'association_uni') {
-    return `Vazba mezi ${srcName} a ${tgtName} má nastavenou jednosměrnou šipku, ale podle zadání má být obousměrnou asociací (<-->).`;
+    return `Vazba mezi ${srcName} a ${tgtName} má nastavenou jen jednu šipku, ale podle zadání má být obousměrnou asociací (<-->).`;
   }
 
   const expLabel = RELATION_TYPE_NAMES[expKind] || expKind;
@@ -137,9 +137,9 @@ function describeDirectionMismatch(expRel, srcName, tgtName) {
   }
   if (expRel.type === 'composition' || expRel.type === 'aggregation') {
     const diamondName = expRel.type === 'composition' ? 'plný kosočtverec' : 'prázdný kosočtverec';
-    return `Vazba mezi ${srcName} a ${tgtName} má obrácený směr – ${diamondName} musí být na straně celku (${srcName}) a otevřená šipka musí směřovat k části (${tgtName}).`;
+    return `Vazba mezi ${srcName} a ${tgtName} má obrácený směr – ${diamondName} musí být na straně celku (${srcName}) a šipka musí směřovat k části (${tgtName}).`;
   }
-  return `Jednosměrná asociace mezi ${srcName} a ${tgtName} má obrácený směr – otevřená šipka řiditelnosti má směřovat od ${srcName} k ${tgtName}.`;
+  return `Asociace mezi ${srcName} a ${tgtName} má obrácený směr – šipka řiditelnosti má směřovat z ${srcName} na ${tgtName}.`;
 }
 
 function describeMultiplicityMismatch(expRel, side, className, srcName, tgtName, actualMult) {
