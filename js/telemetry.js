@@ -21,7 +21,7 @@ function base64ToUtf8(base64) {
 
 /**
  * Deterministický 64-bitový kontrolní podpis (dvojitý FNV-1a s tajným klíčem v config.js).
- * Odhalí jakoukoli ruční úpravu XP, hvězd, režimu progrese či auditního logu v Base64 řetězci.
+ * Odhalí jakoukoli ruční úpravu XP, hvězd, identity, historie přejmenování, režimu progrese či auditního logu.
  */
 export function computeIntegrityHash(canonicalPayloadJson) {
   const secret = APP_CONFIG.integritySecret;
@@ -42,7 +42,7 @@ export function computeIntegrityHash(canonicalPayloadJson) {
 
 /**
  * Vytvoří kompaktní, deterministicky podepsaný Base64 certifikát obsahující
- * celý stav postupu (včetně uložených pláten pro plnou obnovu) i auditní log.
+ * celý stav postupu (včetně uložených pláten pro plnou obnovu), identitní pole i auditní log.
  */
 export function generateBase64Certificate(state, { includeCanvases = true } = {}) {
   const compactSubchapters = {};
@@ -60,7 +60,10 @@ export function generateBase64Certificate(state, { includeCanvases = true } = {}
 
   const payload = {
     version: state.version || APP_CONFIG.version,
+    sessionId: state.sessionId || '',
     studentId: state.studentId || '',
+    initialStudentId: state.initialStudentId || '',
+    nameHistory: Array.isArray(state.nameHistory) ? state.nameHistory : [],
     createdAt: state.createdAt,
     updatedAt: state.updatedAt,
     progressionMode: state.progressionMode,
@@ -84,6 +87,7 @@ export function generateBase64Certificate(state, { includeCanvases = true } = {}
 
 /**
  * Dekóduje Base64 certifikát a ověří podpis integrity i konzistenci XP.
+ * Plně zpětně kompatibilní se staršími certifikáty bez polí sessionId / initialStudentId / nameHistory.
  */
 export function verifyBase64Certificate(base64String) {
   if (!base64String || !base64String.trim()) {
