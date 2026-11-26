@@ -266,26 +266,28 @@ const AUTO_CLASS_DODAVKA = {
 
 const RAW_AUTOSERVIS_SUBCHAPTERS = [
   // --------------------------------------------------------------------------
-  // Krok 1 (2.1): Základní třídy, zapouzdření a řiditelná asociace s multiplicitami
+  // Krok 1 (2.1): Základní třídy, zapouzdření a asociace s multiplicitami
   // --------------------------------------------------------------------------
   {
     id: 'p-auto-01',
     order: 1,
-    title: '2.1 Základní třídy, zapouzdření a řiditelná asociace s multiplicitami',
+    title: '2.1 Základní třídy, zapouzdření a asociace s multiplicitami',
     shortTitle: '2.1 Zákazník a Vozidlo',
-    storyIntro: 'Vítej v dílně Autoservisu! Začneme pevným základem celého systému: propojíme zákazníka s jeho vozidly pomocí jednosměrné řiditelné asociace a cílové role.',
+    storyIntro: 'Vítej v dílně Autoservisu! Začneme pevným základem celého systému: propojíme zákazníka s jeho vozidly pomocí asociace se šipkou a cílové role.',
     inheritPreviousCanvas: false,
     previousSubchapterId: null,
-    assignmentTitle: 'Autoservis 1/4: Základní třídy, zapouzdření a řiditelná asociace s multiplicitami',
+    assignmentTitle: 'Autoservis 1/4: Základní třídy, zapouzdření a asociace s multiplicitami',
     assignmentHtml: `
-      <p>Vytvořte výchozí návrhový diagram tříd (UML 2.5) pro doménu <strong>Autoservis</strong> určený pro implementaci v jazyce Java. Diagram v tomto prvním kroku obsahuje <strong>přesně dvě konkrétní třídy propojené jednou jednosměrnou řiditelnou asociací</strong>. Každá řiditelná vazba je ve zdrojové třídě realizována soukromým referenčním atributem, na který ukazuje cílová role; nemodelujte konstruktory ani žádné nespecifikované atributy či metody.</p>
-      <p>Vytvořte konkrétní třídu <strong>Zakaznik</strong> se všemi atributy soukromými (<code>-</code>): <code>zakaznikId</code> typu <code>String</code>, <code>jmeno</code> typu <code>String</code>, <code>prijmeni</code> typu <code>String</code>, <code>telefon</code> typu <code>String</code>, <code>email</code> typu <code>String</code> a referenčním atributem <code>vozidla</code> typu <code>List&lt;Vozidlo&gt;</code>. Třída poskytuje čtyři veřejné operace (<code>+</code>): <code>pridejVozidlo</code> s parametrem <code>vozidlo</code> typu <code>Vozidlo</code> vracející <code>void</code>, <code>odeberVozidlo</code> s parametrem <code>vin</code> typu <code>String</code> vracející <code>boolean</code>, <code>aktualizujTelefon</code> s parametrem <code>novyTelefon</code> typu <code>String</code> vracející <code>boolean</code> a bezparametrickou operaci <code>ziskejPocetVozidel</code> vracející <code>int</code>.</p>
-      <p>Vytvořte konkrétní třídu <strong>Vozidlo</strong> (v tomto kroku zatím jako běžnou konkrétní třídu, nikoli abstraktní) se všemi atributy soukromými (<code>-</code>): <code>vin</code> typu <code>String</code>, <code>spz</code> typu <code>String</code>, <code>znacka</code> typu <code>String</code>, <code>rokVyroby</code> typu <code>int</code>, <code>najeteKm</code> typu <code>int</code> a <code>technickyZpusobile</code> typu <code>boolean</code>. Třída poskytuje pět veřejných operací (<code>+</code>): bezparametrické operace <code>vypoctiZakladniSazbu</code> vracející <code>BigDecimal</code>, <code>ziskejTypVozidla</code> vracející <code>String</code> a <code>ziskejVin</code> vracející <code>String</code>, dále operaci <code>aktualizujNajezd</code> s parametrem <code>noveKm</code> typu <code>int</code> vracející <code>boolean</code> a operaci <code>nastavTechnickouZpusobilost</code> s parametrem <code>zpusobile</code> typu <code>boolean</code> vracející <code>void</code>. Dále obsahuje jednu soukromou pomocnou operaci (<code>-</code>) <code>overNajezd</code> s parametrem <code>noveKm</code> typu <code>int</code> vracející <code>boolean</code>.</p>
-      <p>Třídy <strong>Zakaznik</strong> a <strong>Vozidlo</strong> propojte <strong>jednosměrnou řiditelnou asociací</strong> směřující ze <code>Zakaznik</code> na <code>Vozidlo</code> (otevřená šipka u <code>Vozidlo</code>). Každé vozidlo patří vždy právě jednomu zákazníkovi (multiplicita <code>1</code> na straně <code>Zakaznik</code>) a každý zákazník musí vlastnit alespoň jedno vozidlo (multiplicita <code>1..*</code> a role <code>vozidla</code> na straně <code>Vozidlo</code>, odpovídající referenčnímu atributu <code>-vozidla: List&lt;Vozidlo&gt;</code> ve třídě <code>Zakaznik</code>).</p>
+      <p><strong>Připravený model v paletě:</strong> Pro výchozí krok domény <strong>Autoservis</strong> máte v paletě připraveny dvě konkrétní návrhové třídy pro jazyk Java:</p>
+      <ul>
+        <li><strong>Zakaznik</strong> obsahuje soukromé atributy (<code>-</code>) <code>zakaznikId: String</code>, <code>jmeno: String</code>, <code>prijmeni: String</code>, <code>telefon: String</code>, <code>email: String</code> a soukromý referenční atribut <code>vozidla: List&lt;Vozidlo&gt;</code>. Poskytuje veřejné operace (<code>+</code>) <code>pridejVozidlo(vozidlo: Vozidlo): void</code>, <code>odeberVozidlo(vin: String): boolean</code>, <code>aktualizujTelefon(novyTelefon: String): boolean</code> a <code>ziskejPocetVozidel(): int</code>.</li>
+        <li><strong>Vozidlo</strong> (v tomto kroku zatím jako konkrétní třída) obsahuje soukromé atributy (<code>-</code>) <code>vin: String</code>, <code>spz: String</code>, <code>znacka: String</code>, <code>rokVyroby: int</code>, <code>najeteKm: int</code> a <code>technickyZpusobile: boolean</code>, veřejné operace (<code>+</code>) <code>vypoctiZakladniSazbu(): BigDecimal</code>, <code>ziskejTypVozidla(): String</code>, <code>ziskejVin(): String</code>, <code>aktualizujNajezd(noveKm: int): boolean</code>, <code>nastavTechnickouZpusobilost(zpusobile: boolean): void</code> a soukromou pomocnou operaci (<code>-</code>) <code>overNajezd(noveKm: int): boolean</code>.</li>
+      </ul>
+      <p><strong>Váš úkol na plátně:</strong> Umístěte na plátno obě třídy (<code>Zakaznik</code> a <code>Vozidlo</code>) a propojte je <strong>asociací směřující ze <code>Zakaznik</code> na <code>Vozidlo</code></strong> (šipka u <code>Vozidlo</code>). Každé vozidlo patří vždy právě jednomu zákazníkovi (multiplicita <code>1</code> na straně <code>Zakaznik</code>) a každý zákazník musí vlastnit alespoň jedno vozidlo (multiplicita <code>1..*</code> a role <code>vozidla</code> na straně <code>Vozidlo</code>, odpovídající referenčnímu atributu <code>-vozidla: List&lt;Vozidlo&gt;</code> ve třídě <code>Zakaznik</code>).</p>
     `,
     requirements: [
       'Umístěte na plátno konkrétní třídy <strong>Zakaznik</strong> (včetně referenčního atributu <code>-vozidla: List&lt;Vozidlo&gt;</code>) a <strong>Vozidlo</strong>.',
-      'Propojte je <strong>jednosměrnou řiditelnou asociací</strong> směřující ze <code>Zakaznik</code> na <code>Vozidlo</code> (otevřená šipka u <code>Vozidlo</code>).',
+      'Propojte je <strong>asociací</strong> směřující ze <code>Zakaznik</code> na <code>Vozidlo</code> (šipka u <code>Vozidlo</code>).',
       'Nastavte multiplicitu <code>1</code> na straně <code>Zakaznik</code> a multiplicitu <code>1..*</code> s rolí <code>vozidla</code> na straně <code>Vozidlo</code>.'
     ],
     hints: [
@@ -307,7 +309,7 @@ const RAW_AUTOSERVIS_SUBCHAPTERS = [
           targetMultiplicity: '1..*',
           targetRole: 'vozidla',
           feedback: {
-            wrongType: 'Mezi třídami Zakaznik a Vozidlo použij jednosměrnou řiditelnou asociaci (otevřená šipka u Vozidlo), nikoli obousměrnou asociaci (<-->).',
+            wrongType: 'Mezi třídami Zakaznik a Vozidlo použij asociaci se šipkou u Vozidlo, nikoli obousměrnou asociaci (<-->).',
             wrongDirection: 'Šipka řiditelnosti musí směřovat od Zakaznik (který drží referenční atribut vozidla) k Vozidlo.',
             wrongSourceMultiplicity: 'U vazby Zakaznik → Vozidlo nastav na straně Zakaznik multiplicitu „1“ (každé vozidlo patří právě jednomu zákazníkovi).',
             wrongTargetMultiplicity: 'U vazby Zakaznik → Vozidlo nastav na straně Vozidlo multiplicitu „1..*“ (každý zákazník vlastní alespoň jedno vozidlo).',
@@ -326,24 +328,27 @@ const RAW_AUTOSERVIS_SUBCHAPTERS = [
     order: 2,
     title: '2.2 Řiditelnost asociací, role a referenční atributy',
     shortTitle: '2.2 Zakázka a Mechanik',
-    storyIntro: 'Výborně, základ stojí. Teď na tvé plátno přivedeme servisní zakázky a mechaniky – zachovej stávající vazbu a veď jednosměrné řiditelné asociace od zakázky.',
+    storyIntro: 'Výborně, základ stojí. Teď na tvé plátno přivedeme servisní zakázky a mechaniky – zachovej stávající vazbu a veď asociace od zakázky k přidělenému mechanikovi i opravovanému vozidlu.',
     inheritPreviousCanvas: true,
     previousSubchapterId: 'p-auto-01',
     assignmentTitle: 'Autoservis 2/4: Řiditelnost asociací, role a referenční atributy',
     assignmentHtml: `
-      <p>Navazujte na svůj diagram z <strong>Podkapitoly 2.1</strong> a rozšiřte jej o servisní zakázky, mechaniky a jednosměrně řiditelné asociace s rolemi navázanými na referenční atributy. Všechny stávající třídy, atributy, metody i vazbu <code>Zakaznik → Vozidlo</code> z předchozího kroku zachovejte beze změny a proveďte přesně následující doplnění:</p>
+      <p><strong>Připravený model v paletě:</strong> Navazujete na svůj diagram z <strong>Podkapitoly 2.1</strong> (třídy <code>Zakaznik</code> a <code>Vozidlo</code> i jejich vazba zůstávají na plátně). V paletě přibyly dvě nové konkrétní třídy:</p>
       <ul>
-        <li><strong>Nová konkrétní třída Mechanik:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>mechanikId</code> typu <code>String</code>, <code>jmeno</code> typu <code>String</code>, <code>prijmeni</code> typu <code>String</code>, <code>specializace</code> typu <code>String</code> a <code>dostupny</code> typu <code>boolean</code>. Přidejte tři veřejné operace (<code>+</code>): <code>nastavDostupnost</code> s parametrem <code>dostupny</code> typu <code>boolean</code> vracející <code>void</code>, <code>zmenSpecializaci</code> s parametrem <code>novaSpecializace</code> typu <code>String</code> vracející <code>void</code> a bezparametrickou operaci <code>jeDostupny</code> vracející <code>boolean</code>.</li>
-        <li><strong>Nová konkrétní třída ServisniZakazka</strong> (základní rozsah před zavedením položek zakázky): Přidejte třídu se soukromými atributy (<code>-</code>): <code>cisloZakazky</code> typu <code>String</code>, <code>datumPrijeti</code> typu <code>LocalDateTime</code>, <code>planovaneDokonceni</code> typu <code>LocalDate</code>, <code>stav</code> typu <code>String</code>, <code>poznamka</code> typu <code>String</code> a dvěma soukromými referenčními atributy <code>pridelenyMechanik</code> typu <code>Mechanik</code> a <code>opravovaneVozidlo</code> typu <code>Vozidlo</code>. Přidejte tři veřejné operace (<code>+</code>): <code>priradMechanika</code> s parametrem <code>mechanik</code> typu <code>Mechanik</code> vracející <code>void</code>, bezparametrickou operaci <code>vypoctiCelkovouCenu</code> vracející <code>BigDecimal</code> a bezparametrickou operaci <code>uzavriZakazku</code> vracející <code>boolean</code>. Dále přidejte jednu soukromou pomocnou operaci (<code>-</code>) <code>vypoctiDph</code> s parametrem <code>zakladDane</code> typu <code>BigDecimal</code> vracející <code>BigDecimal</code>.</li>
-        <li><strong>Nová vazba ServisniZakazka → Mechanik:</strong> Vytvořte jednosměrnou řiditelnou asociaci směřující ze <code>ServisniZakazka</code> na <code>Mechanik</code> (otevřená šipka u <code>Mechanik</code>). Na straně <code>ServisniZakazka</code> uveďte multiplicitu <code>0..*</code>, na straně <code>Mechanik</code> uveďte multiplicitu <code>0..1</code> a roli <code>pridelenyMechanik</code> (odpovídající referenčnímu atributu <code>-pridelenyMechanik: Mechanik</code>).</li>
-        <li><strong>Nová vazba ServisniZakazka → Vozidlo:</strong> Vytvořte jednosměrnou řiditelnou asociaci směřující ze <code>ServisniZakazka</code> na <code>Vozidlo</code> (otevřená šipka u <code>Vozidlo</code>). Na straně <code>ServisniZakazka</code> uveďte multiplicitu <code>0..*</code>, na straně <code>Vozidlo</code> uveďte multiplicitu <code>1</code> a roli <code>opravovaneVozidlo</code> (odpovídající referenčnímu atributu <code>-opravovaneVozidlo: Vozidlo</code>).</li>
+        <li><strong>Mechanik</strong> obsahuje soukromé atributy (<code>-</code>) <code>mechanikId: String</code>, <code>jmeno: String</code>, <code>prijmeni: String</code>, <code>specializace: String</code> a <code>dostupny: boolean</code> a veřejné operace (<code>+</code>) <code>nastavDostupnost(dostupny: boolean): void</code>, <code>zmenSpecializaci(novaSpecializace: String): void</code> a <code>jeDostupny(): boolean</code>.</li>
+        <li><strong>ServisniZakazka</strong> (základní rozsah před zavedením položek zakázky) obsahuje soukromé atributy (<code>-</code>) <code>cisloZakazky: String</code>, <code>datumPrijeti: LocalDateTime</code>, <code>planovaneDokonceni: LocalDate</code>, <code>stav: String</code>, <code>poznamka: String</code> a dva soukromé referenční atributy <code>pridelenyMechanik: Mechanik</code> a <code>opravovaneVozidlo: Vozidlo</code>. Poskytuje veřejné operace (<code>+</code>) <code>priradMechanika(mechanik: Mechanik): void</code>, <code>vypoctiCelkovouCenu(): BigDecimal</code>, <code>uzavriZakazku(): boolean</code> a soukromou pomocnou operaci (<code>-</code>) <code>vypoctiDph(zakladDane: BigDecimal): BigDecimal</code>.</li>
+      </ul>
+      <p><strong>Váš úkol na plátně:</strong> Zachovejte stávající třídy a vazbu <code>Zakaznik → Vozidlo</code>, přidejte z palety třídy <code>Mechanik</code> a <code>ServisniZakazka</code> a vytvořte dvě nové asociace:</p>
+      <ul>
+        <li><strong>ServisniZakazka → Mechanik:</strong> Vytvořte asociaci směřující ze <code>ServisniZakazka</code> na <code>Mechanik</code> (šipka u <code>Mechanik</code>) s multiplicitou <code>0..*</code> na straně <code>ServisniZakazka</code> a multiplicitou <code>0..1</code> a rolí <code>pridelenyMechanik</code> na straně <code>Mechanik</code> (odpovídající referenčnímu atributu <code>-pridelenyMechanik: Mechanik</code>).</li>
+        <li><strong>ServisniZakazka → Vozidlo:</strong> Vytvořte asociaci směřující ze <code>ServisniZakazka</code> na <code>Vozidlo</code> (šipka u <code>Vozidlo</code>) s multiplicitou <code>0..*</code> na straně <code>ServisniZakazka</code> a multiplicitou <code>1</code> a rolí <code>opravovaneVozidlo</code> na straně <code>Vozidlo</code> (odpovídající referenčnímu atributu <code>-opravovaneVozidlo: Vozidlo</code>).</li>
       </ul>
     `,
     requirements: [
-      'Zachovejte stávající třídy <code>Zakaznik</code>, <code>Vozidlo</code> i jejich jednosměrnou řiditelnou asociaci <code>Zakaznik (1)</code> → <code>Vozidlo (1..*, role: vozidla)</code>.',
-      'Přidejte na plátno nové třídy <strong>Mechanik</strong> a <strong>ServisniZakazka</strong> (s referenčními atributy <code>-pridelenyMechanik: Mechanik</code> a <code>-opravovaneVozidlo: Vozidlo</code>).',
-      'Vytvořte jednosměrnou řiditelnou asociaci <code>ServisniZakazka (0..*)</code> → <code>Mechanik (0..1, role: pridelenyMechanik)</code>.',
-      'Vytvořte jednosměrnou řiditelnou asociaci <code>ServisniZakazka (0..*)</code> → <code>Vozidlo (1, role: opravovaneVozidlo)</code>.'
+      'Zachovejte stávající třídy <code>Zakaznik</code>, <code>Vozidlo</code> i jejich asociaci <code>Zakaznik (1)</code> → <code>Vozidlo (1..*, role: vozidla)</code>.',
+      'Přidejte z palety nové třídy <strong>Mechanik</strong> a <strong>ServisniZakazka</strong> (s referenčními atributy <code>-pridelenyMechanik: Mechanik</code> a <code>-opravovaneVozidlo: Vozidlo</code>).',
+      'Vytvořte asociaci <code>ServisniZakazka (0..*)</code> → <code>Mechanik (0..1, role: pridelenyMechanik)</code>.',
+      'Vytvořte asociaci <code>ServisniZakazka (0..*)</code> → <code>Vozidlo (1, role: opravovaneVozidlo)</code>.'
     ],
     hints: [
       'U obou nových vazeb vycházejících ze ServisniZakazka odpovídá cílová role přesně názvu referenčního atributu ve třídě ServisniZakazka (pridelenyMechanik a opravovaneVozidlo).'
@@ -411,22 +416,24 @@ const RAW_AUTOSERVIS_SUBCHAPTERS = [
     previousSubchapterId: 'p-auto-02',
     assignmentTitle: 'Autoservis 3/4: Vazby celek–část (agregace a kompozice)',
     assignmentHtml: `
-      <p>Navazujte na svůj diagram z <strong>Podkapitoly 2.2</strong> a doplňte ústřední provozovnu autoservisu, fakturované položky zakázek a vazby typu celek–část (agregace a kompozice). Všechny dosavadní prvky z předchozího kroku zachovejte a proveďte přesně následující změny (cílová role každé vazby ukazuje na odpovídající referenční atribut ve zdrojové třídě):</p>
+      <p><strong>Rozšíření modelu a nové třídy v paletě:</strong> Navazujete na svůj diagram z <strong>Podkapitoly 2.2</strong>. Do stávající třídy <code>ServisniZakazka</code> na plátně se automaticky promítl soukromý referenční atribut (<code>-</code>) <code>polozky: List&lt;PolozkaZakazky&gt;</code> a veřejné operace <code>pridejPolozku(polozka: PolozkaZakazky): void</code> a <code>odeberPolozku(polozkaId: String): boolean</code>. V paletě jsou nově připraveny dvě konkrétní třídy:</p>
       <ul>
-        <li><strong>Úprava stávající třídy ServisniZakazka:</strong> Doplňte soukromý referenční atribut (<code>-</code>) <code>polozky</code> typu <code>List&lt;PolozkaZakazky&gt;</code> a dvě veřejné operace (<code>+</code>) pro správu položek: <code>pridejPolozku</code> s parametrem <code>polozka</code> typu <code>PolozkaZakazky</code> vracející <code>void</code> a <code>odeberPolozku</code> s parametrem <code>polozkaId</code> typu <code>String</code> vracející <code>boolean</code> <em>(aktualizace se automaticky promítla na kartě třídy na plátně)</em>.</li>
-        <li><strong>Nová konkrétní třída Autoservis:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>nazev</code> typu <code>String</code>, <code>ico</code> typu <code>String</code>, <code>adresa</code> typu <code>String</code>, <code>hodinovaSazba</code> typu <code>BigDecimal</code> a dvěma soukromými referenčními atributy <code>mechanici</code> typu <code>List&lt;Mechanik&gt;</code> a <code>zakazky</code> typu <code>List&lt;ServisniZakazka&gt;</code>. Přidejte pět veřejných operací (<code>+</code>): <code>pridejMechanika</code> s parametrem <code>mechanik</code> typu <code>Mechanik</code> vracející <code>void</code>, <code>odeberMechanika</code> s parametrem <code>mechanikId</code> typu <code>String</code> vracející <code>boolean</code>, <code>zalozZakazku</code> s parametrem <code>zakazka</code> typu <code>ServisniZakazka</code> vracející <code>void</code>, <code>najdiZakazku</code> s parametrem <code>cisloZakazky</code> typu <code>String</code> vracející <code>ServisniZakazka</code> a bezparametrickou operaci <code>ziskejPocetOtevrenychZakazek</code> vracející <code>int</code>.</li>
-        <li><strong>Nová konkrétní třída PolozkaZakazky:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>polozkaId</code> typu <code>String</code>, <code>popis</code> typu <code>String</code>, <code>mnozstvi</code> typu <code>double</code>, <code>jednotkovaCena</code> typu <code>BigDecimal</code> a <code>jeNahradniDil</code> typu <code>boolean</code>. Přidejte tři veřejné operace (<code>+</code>): bezparametrickou operaci <code>vypoctiMezisoucet</code> vracející <code>BigDecimal</code>, operaci <code>upravMnozstvi</code> s parametrem <code>noveMnozstvi</code> typu <code>double</code> vracející <code>boolean</code> a operaci <code>zmenJednotkovouCenu</code> s parametrem <code>novaCena</code> typu <code>BigDecimal</code> vracející <code>boolean</code>.</li>
-        <li><strong>Nová agregace Autoservis ◇→ Mechanik:</strong> Autoservis sdružuje mechaniky s nezávislým životním cyklem (při zrušení autoservisu záznamy mechaniků v systému nadále existují). Vytvořte <strong>jednosměrnou řiditelnou agregaci</strong> z celku <code>Autoservis</code> (prázdný kosočtverec u <code>Autoservis</code>) k části <code>Mechanik</code> (šipka u <code>Mechanik</code>). Na straně <code>Autoservis</code> uveďte multiplicitu <code>0..1</code>, na straně <code>Mechanik</code> uveďte multiplicitu <code>0..*</code> a roli <code>mechanici</code> (odpovídající atributu <code>-mechanici: List&lt;Mechanik&gt;</code>).</li>
-        <li><strong>Nová kompozice Autoservis ◆→ ServisniZakazka:</strong> Servisní zakázky jsou existenčně závislou součástí autoservisu a při jeho zrušení zanikají. Vytvořte <strong>jednosměrnou řiditelnou kompozici</strong> z celku <code>Autoservis</code> (plný kosočtverec u <code>Autoservis</code>) k části <code>ServisniZakazka</code> (šipka u <code>ServisniZakazka</code>). Na straně <code>Autoservis</code> uveďte multiplicitu <code>1</code>, na straně <code>ServisniZakazka</code> uveďte multiplicitu <code>0..*</code> a roli <code>zakazky</code> (odpovídající atributu <code>-zakazky: List&lt;ServisniZakazka&gt;</code>).</li>
-        <li><strong>Nová kompozice ServisniZakazka ◆→ PolozkaZakazky:</strong> Položky zakázky jsou existenčně vázány na konkrétní zakázku a při jejím odstranění zanikají. Vytvořte <strong>jednosměrnou řiditelnou kompozici</strong> z celku <code>ServisniZakazka</code> (plný kosočtverec u <code>ServisniZakazka</code>) k části <code>PolozkaZakazky</code> (šipka u <code>PolozkaZakazky</code>). Na straně <code>ServisniZakazka</code> uveďte multiplicitu <code>1</code>, na straně <code>PolozkaZakazky</code> uveďte multiplicitu <code>1..*</code> a roli <code>polozky</code> (odpovídající atributu <code>-polozky: List&lt;PolozkaZakazky&gt;</code>).</li>
+        <li><strong>Autoservis</strong> obsahuje soukromé atributy (<code>-</code>) <code>nazev: String</code>, <code>ico: String</code>, <code>adresa: String</code>, <code>hodinovaSazba: BigDecimal</code>, soukromé referenční atributy <code>mechanici: List&lt;Mechanik&gt;</code> a <code>zakazky: List&lt;ServisniZakazka&gt;</code> a veřejné operace (<code>+</code>) <code>pridejMechanika(mechanik: Mechanik): void</code>, <code>odeberMechanika(mechanikId: String): boolean</code>, <code>zalozZakazku(zakazka: ServisniZakazka): void</code>, <code>najdiZakazku(cisloZakazky: String): ServisniZakazka</code> a <code>ziskejPocetOtevrenychZakazek(): int</code>.</li>
+        <li><strong>PolozkaZakazky</strong> obsahuje soukromé atributy (<code>-</code>) <code>polozkaId: String</code>, <code>popis: String</code>, <code>mnozstvi: double</code>, <code>jednotkovaCena: BigDecimal</code> a <code>jeNahradniDil: boolean</code> a veřejné operace (<code>+</code>) <code>vypoctiMezisoucet(): BigDecimal</code>, <code>upravMnozstvi(noveMnozstvi: double): boolean</code> a <code>zmenJednotkovouCenu(novaCena: BigDecimal): boolean</code>.</li>
+      </ul>
+      <p><strong>Váš úkol na plátně:</strong> Zachovejte všechny dosavadní třídy a vazby z kroku 2.2, přidejte z palety třídy <code>Autoservis</code> a <code>PolozkaZakazky</code> a vytvořte tři vazby typu celek–část:</p>
+      <ul>
+        <li><strong>Agregace Autoservis ◇→ Mechanik:</strong> Autoservis sdružuje mechaniky s nezávislým životním cyklem (při zrušení autoservisu záznamy mechaniků v systému nadále existují). Vytvořte <strong>agregaci</strong> z celku <code>Autoservis</code> (prázdný kosočtverec u <code>Autoservis</code>) k části <code>Mechanik</code> (šipka u <code>Mechanik</code>) s multiplicitou <code>0..1</code> na straně <code>Autoservis</code> a multiplicitou <code>0..*</code> a rolí <code>mechanici</code> na straně <code>Mechanik</code>.</li>
+        <li><strong>Kompozice Autoservis ◆→ ServisniZakazka:</strong> Servisní zakázky jsou existenčně závislou součástí autoservisu a při jeho zrušení zanikají. Vytvořte <strong>kompozici</strong> z celku <code>Autoservis</code> (plný kosočtverec u <code>Autoservis</code>) k části <code>ServisniZakazka</code> (šipka u <code>ServisniZakazka</code>) s multiplicitou <code>1</code> na straně <code>Autoservis</code> a multiplicitou <code>0..*</code> a rolí <code>zakazky</code> na straně <code>ServisniZakazka</code>.</li>
+        <li><strong>Kompozice ServisniZakazka ◆→ PolozkaZakazky:</strong> Položky zakázky jsou existenčně vázány na konkrétní zakázku a při jejím odstranění zanikají. Vytvořte <strong>kompozici</strong> z celku <code>ServisniZakazka</code> (plný kosočtverec u <code>ServisniZakazka</code>) k části <code>PolozkaZakazky</code> (šipka u <code>PolozkaZakazky</code>) s multiplicitou <code>1</code> na straně <code>ServisniZakazka</code> a multiplicitou <code>1..*</code> a rolí <code>polozky</code> na straně <code>PolozkaZakazky</code>.</li>
       </ul>
     `,
     requirements: [
-      'Zachovejte všechny 4 stávající třídy a 3 vazby z předchozího kroku.',
+      'Zachovejte všechny 4 stávající třídy a 3 vazby z předchozího kroku 2.2.',
       'Přidejte z palety nové třídy <strong>Autoservis</strong> (s referenčními atributy <code>-mechanici: List&lt;Mechanik&gt;</code> a <code>-zakazky: List&lt;ServisniZakazka&gt;</code>) a <strong>PolozkaZakazky</strong>.',
-      'Vytvořte jednosměrnou řiditelnou <strong>agregaci</strong> <code>Autoservis (0..1)</code> ◇→ <code>Mechanik (0..*, role: mechanici)</code>.',
-      'Vytvořte jednosměrnou řiditelnou <strong>kompozici</strong> <code>Autoservis (1)</code> ◆→ <code>ServisniZakazka (0..*, role: zakazky)</code>.',
-      'Vytvořte jednosměrnou řiditelnou <strong>kompozici</strong> <code>ServisniZakazka (1)</code> ◆→ <code>PolozkaZakazky (1..*, role: polozky)</code>.'
+      'Vytvořte <strong>agregaci</strong> <code>Autoservis (0..1)</code> ◇→ <code>Mechanik (0..*, role: mechanici)</code>.',
+      'Vytvořte <strong>kompozici</strong> <code>Autoservis (1)</code> ◆→ <code>ServisniZakazka (0..*, role: zakazky)</code>.',
+      'Vytvořte <strong>kompozici</strong> <code>ServisniZakazka (1)</code> ◆→ <code>PolozkaZakazky (1..*, role: polozky)</code>.'
     ],
     hints: [
       'Autoservis → Mechanik je slabá agregace (prázdný kosočtverec, 0..1), zatímco Autoservis → ServisniZakazka i ServisniZakazka → PolozkaZakazky jsou silné kompozice (plný kosočtverec, 1). Cílové role mechanici, zakazky a polozky odpovídají referenčním atributům typu List<...>.'
@@ -454,7 +461,7 @@ const RAW_AUTOSERVIS_SUBCHAPTERS = [
           targetMultiplicity: '0..*',
           targetRole: 'mechanici',
           feedback: {
-            wrongType: 'Mechanici mají nezávislý životní cyklus (při zrušení autoservisu nezanikají) – mezi Autoservis a Mechanik použij jednosměrnou řiditelnou agregaci (prázdný kosočtverec).',
+            wrongType: 'Mechanici mají nezávislý životní cyklus (při zrušení autoservisu nezanikají) – mezi Autoservis a Mechanik použij agregaci (prázdný kosočtverec).',
             wrongSourceMultiplicity: 'U agregace Autoservis ◇→ Mechanik uveď na straně Autoservis multiplicitu „0..1“.',
             wrongTargetRole: 'U agregace Autoservis ◇→ Mechanik uveď na straně Mechanik roli „mechanici“ odpovídající referenčnímu atributu -mechanici: List<Mechanik>.'
           }
@@ -470,7 +477,7 @@ const RAW_AUTOSERVIS_SUBCHAPTERS = [
           targetMultiplicity: '0..*',
           targetRole: 'zakazky',
           feedback: {
-            wrongType: 'Servisní zakázky jsou existenčně závislé na autoservisu – mezi Autoservis a ServisniZakazka použij jednosměrnou řiditelnou kompozici (plný kosočtverec).',
+            wrongType: 'Servisní zakázky jsou existenčně závislé na autoservisu – mezi Autoservis a ServisniZakazka použij kompozici (plný kosočtverec).',
             wrongSourceMultiplicity: 'U kompozice Autoservis ◆→ ServisniZakazka musí být na straně celku (Autoservis) multiplicita „1“.',
             wrongTargetRole: 'U kompozice Autoservis ◆→ ServisniZakazka uveď na straně ServisniZakazka roli „zakazky“ odpovídající referenčnímu atributu -zakazky: List<ServisniZakazka>.'
           }
@@ -486,7 +493,7 @@ const RAW_AUTOSERVIS_SUBCHAPTERS = [
           targetMultiplicity: '1..*',
           targetRole: 'polozky',
           feedback: {
-            wrongType: 'Položky zakázky zanikají spolu se zakázkou – mezi ServisniZakazka a PolozkaZakazky použij jednosměrnou řiditelnou kompozici (plný kosočtverec).',
+            wrongType: 'Položky zakázky zanikají spolu se zakázkou – mezi ServisniZakazka a PolozkaZakazky použij kompozici (plný kosočtverec).',
             wrongSourceMultiplicity: 'U kompozice ServisniZakazka ◆→ PolozkaZakazky musí být na straně celku (ServisniZakazka) multiplicita „1“.',
             wrongTargetMultiplicity: 'Každá servisní zakázka musí obsahovat alespoň jednu položku – na straně PolozkaZakazky uveď multiplicitu „1..*“.',
             wrongTargetRole: 'U kompozice ServisniZakazka ◆→ PolozkaZakazky uveď na straně PolozkaZakazky roli „polozky“ odpovídající referenčnímu atributu -polozky: List<PolozkaZakazky>.'
@@ -542,13 +549,12 @@ const RAW_AUTOSERVIS_SUBCHAPTERS = [
     previousSubchapterId: 'p-auto-03',
     assignmentTitle: 'Autoservis 4/4: Generalizace, abstraktní třída a finální podoba diagramu',
     assignmentHtml: `
-      <p>Navazujte na svůj diagram z <strong>Podkapitoly 2.3</strong> a dokončete jej do finální celistvé podoby převedením třídy <code>Vozidlo</code> na abstraktní nadtřídu a doplněním konkrétních specializací vozidel. Všechny ostatní dosavadní třídy, referenční atributy a vazby zachovejte beze změny a proveďte přesně tyto úpravy:</p>
+      <p><strong>Refaktoring modelu a nové podtřídy v paletě:</strong> Navazujete na svůj diagram z <strong>Podkapitoly 2.3</strong>. Třída <code>Vozidlo</code> na plátně byla automaticky převedena na <strong>abstraktní nadtřídu</strong> (<code>abstract</code>): atributy <code>najeteKm</code> a <code>technickyZpusobile</code> i pomocná operace <code>overNajezd</code> získaly chráněnou viditelnost (<code>#</code>) pro potomky a bezparametrické operace <code>+vypoctiZakladniSazbu(): BigDecimal</code> a <code>+ziskejTypVozidla(): String</code> jsou nyní abstraktní (<code>{abstract}</code>). V paletě jsou nově připraveny dvě konkrétní specializace vozidel:</p>
       <ul>
-        <li><strong>Refaktoring třídy Vozidlo:</strong> Změňte třídu <code>Vozidlo</code> na <strong>abstraktní třídu</strong> (<code>abstract</code>). Změňte viditelnost atributů <code>najeteKm</code> (<code>int</code>) a <code>technickyZpusobile</code> (<code>boolean</code>) ze soukromé (<code>-</code>) na chráněnou (<code>#</code>) (atributy <code>vin</code>, <code>spz</code>, <code>znacka</code> a <code>rokVyroby</code> zůstávají soukromé <code>-</code>). Označte bezparametrické veřejné operace <code>+vypoctiZakladniSazbu(): BigDecimal</code> a <code>+ziskejTypVozidla(): String</code> jako abstraktní (<code>{abstract}</code>). Změňte viditelnost pomocné operace <code>overNajezd(noveKm: int): boolean</code> ze soukromé (<code>-</code>) na chráněnou (<code>#</code>) <em>(refaktoring třídy se automaticky projevil na tvém plátně)</em>.</li>
-        <li><strong>Nová konkrétní podtřída OsobniAuto:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>pocetMist</code> typu <code>int</code>, <code>typKaroserie</code> typu <code>String</code> a <code>maTazneZarizeni</code> typu <code>boolean</code>. Přidejte tři veřejné operace (<code>+</code>): bezparametrickou operaci <code>vypoctiZakladniSazbu</code> vracející <code>BigDecimal</code>, bezparametrickou operaci <code>ziskejTypVozidla</code> vracející <code>String</code> a operaci <code>nastavTazneZarizeni</code> s parametrem <code>pritomno</code> typu <code>boolean</code> vracející <code>void</code>.</li>
-        <li><strong>Nová konkrétní podtřída Dodavka:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>nosnostKg</code> typu <code>double</code> a <code>objemNakladuM3</code> typu <code>double</code>. Přidejte tři veřejné operace (<code>+</code>): bezparametrickou operaci <code>vypoctiZakladniSazbu</code> vracející <code>BigDecimal</code>, bezparametrickou operaci <code>ziskejTypVozidla</code> vracející <code>String</code> a operaci <code>jeNadLimitNosnosti</code> s parametrem <code>aktualniZatizeniKg</code> typu <code>double</code> vracející <code>boolean</code>. Dále přidejte jednu soukromou pomocnou operaci (<code>-</code>) <code>overZatizeni</code> s parametrem <code>zatizeniKg</code> typu <code>double</code> vracející <code>boolean</code>.</li>
-        <li><strong>Nové vazby generalizace:</strong> Napojte obě nové podtřídy na abstraktní nadtřídu <code>Vozidlo</code> pomocí <strong>dvou vazeb generalizace</strong> (plná čára s prázdnou trojúhelníkovou šipkou směřující k <code>Vozidlo</code>): <code>OsobniAuto</code> dědí z <code>Vozidlo</code> a <code>Dodavka</code> dědí z <code>Vozidlo</code>.</li>
+        <li><strong>OsobniAuto</strong> obsahuje soukromé atributy (<code>-</code>) <code>pocetMist: int</code>, <code>typKaroserie: String</code> a <code>maTazneZarizeni: boolean</code> a veřejné operace (<code>+</code>) <code>vypoctiZakladniSazbu(): BigDecimal</code>, <code>ziskejTypVozidla(): String</code> a <code>nastavTazneZarizeni(pritomno: boolean): void</code>.</li>
+        <li><strong>Dodavka</strong> obsahuje soukromé atributy (<code>-</code>) <code>nosnostKg: double</code> a <code>objemNakladuM3: double</code>, veřejné operace (<code>+</code>) <code>vypoctiZakladniSazbu(): BigDecimal</code>, <code>ziskejTypVozidla(): String</code> a <code>jeNadLimitNosnosti(aktualniZatizeniKg: double): boolean</code> a soukromou pomocnou operaci (<code>-</code>) <code>overZatizeni(zatizeniKg: double): boolean</code>.</li>
       </ul>
+      <p><strong>Váš úkol na plátně:</strong> Zachovejte všech 6 dosavadních tříd a 6 vazeb z kroku 2.3, přidejte z palety konkrétní podtřídy <code>OsobniAuto</code> a <code>Dodavka</code> a napojte je na abstraktní nadtřídu <code>Vozidlo</code> pomocí <strong>dvou vazeb generalizace</strong> (plná čára s prázdným trojúhelníkem směřujícím k <code>Vozidlo</code>, bez multiplicit a rolí): <code>OsobniAuto</code> dědí z <code>Vozidlo</code> a <code>Dodavka</code> dědí z <code>Vozidlo</code>.</p>
     `,
     requirements: [
       'Zachovejte všech 6 dosavadních tříd (včetně aktualizované abstraktní třídy <code>Vozidlo</code>) a všech 6 vazeb z kroku 2.3.',
@@ -884,26 +890,28 @@ const BANKA_CLASS_SPORICI_UCET = {
 
 const RAW_BANKA_SUBCHAPTERS = [
   // --------------------------------------------------------------------------
-  // Krok 1 (2.1): Základní třídy, zapouzdření a řiditelná asociace s multiplicitami
+  // Krok 1 (3.1): Základní třídy, zapouzdření a asociace s multiplicitami
   // --------------------------------------------------------------------------
   {
     id: 'p-banka-01',
     order: 1,
-    title: '2.1 Základní třídy, zapouzdření a řiditelná asociace s multiplicitami',
-    shortTitle: '2.1 Klient a Účet',
-    storyIntro: 'Vstupuješ do bankovního domu! Nejdříve postavíme základní stavební kámen finančního systému: jednosměrnou řiditelnou asociaci mezi klientem a jeho bankovními účty.',
+    title: '3.1 Základní třídy, zapouzdření a asociace s multiplicitami',
+    shortTitle: '3.1 Klient a Účet',
+    storyIntro: 'Vstupuješ do bankovního domu! Nejdříve postavíme základní stavební kámen finančního systému: asociaci směřující od klienta k jeho bankovním účtům.',
     inheritPreviousCanvas: false,
     previousSubchapterId: null,
-    assignmentTitle: 'Banka 1/4: Základní třídy, zapouzdření a řiditelná asociace s multiplicitami',
+    assignmentTitle: 'Banka 1/4: Základní třídy, zapouzdření a asociace s multiplicitami',
     assignmentHtml: `
-      <p>Vytvořte výchozí návrhový diagram tříd (UML 2.5) pro doménu <strong>Banka</strong> určený pro implementaci v jazyce Java. Diagram v tomto prvním kroku obsahuje <strong>přesně dvě konkrétní třídy propojené jednou jednosměrnou řiditelnou asociací</strong>. Každá řiditelná vazba je ve zdrojové třídě realizována soukromým referenčním atributem, na který ukazuje cílová role; nemodelujte konstruktory ani žádné nespecifikované atributy či metody.</p>
-      <p>Vytvořte konkrétní třídu <strong>Klient</strong> se všemi atributy soukromými (<code>-</code>): <code>klientId</code> typu <code>String</code>, <code>jmeno</code> typu <code>String</code>, <code>prijmeni</code> typu <code>String</code>, <code>datumNarozeni</code> typu <code>LocalDate</code>, <code>email</code> typu <code>String</code> a referenčním atributem <code>ucty</code> typu <code>List&lt;BankovniUcet&gt;</code>. Třída poskytuje tři veřejné operace (<code>+</code>): <code>pridejUcet</code> s parametrem <code>ucet</code> typu <code>BankovniUcet</code> vracející <code>void</code>, bezparametrickou operaci <code>ziskejCelkovyZustatek</code> vracející <code>BigDecimal</code> a operaci <code>aktualizujEmail</code> s parametrem <code>novyEmail</code> typu <code>String</code> vracející <code>boolean</code>.</p>
-      <p>Vytvořte konkrétní třídu <strong>BankovniUcet</strong> (v tomto kroku zatím jako běžnou konkrétní třídu, nikoli abstraktní) se všemi atributy soukromými (<code>-</code>): <code>cisloUctu</code> typu <code>String</code>, <code>zustatek</code> typu <code>BigDecimal</code>, <code>datumZalozeni</code> typu <code>LocalDate</code> a <code>aktivni</code> typu <code>boolean</code>. Třída poskytuje čtyři veřejné operace (<code>+</code>): <code>vloz</code> s parametrem <code>castka</code> typu <code>BigDecimal</code> vracející <code>boolean</code>, <code>vyber</code> s parametrem <code>castka</code> typu <code>BigDecimal</code> vracející <code>boolean</code>, bezparametrickou operaci <code>ziskejZustatek</code> vracející <code>BigDecimal</code> a bezparametrickou operaci <code>zablokujUcet</code> vracející <code>void</code>.</p>
-      <p>Třídy <strong>Klient</strong> a <strong>BankovniUcet</strong> propojte <strong>jednosměrnou řiditelnou asociací</strong> směřující z <code>Klient</code> na <code>BankovniUcet</code> (otevřená šipka u <code>BankovniUcet</code>). Každý bankovní účet patří vždy právě jednomu klientovi (multiplicita <code>1</code> na straně <code>Klient</code>) a každý klient musí vlastnit alespoň jeden bankovní účet (multiplicita <code>1..*</code> a role <code>ucty</code> na straně <code>BankovniUcet</code>, odpovídající referenčnímu atributu <code>-ucty: List&lt;BankovniUcet&gt;</code> ve třídě <code>Klient</code>).</p>
+      <p><strong>Připravený model v paletě:</strong> Pro výchozí krok domény <strong>Banka</strong> máte v paletě připraveny dvě konkrétní návrhové třídy pro jazyk Java:</p>
+      <ul>
+        <li><strong>Klient</strong> obsahuje soukromé atributy (<code>-</code>) <code>klientId: String</code>, <code>jmeno: String</code>, <code>prijmeni: String</code>, <code>datumNarozeni: LocalDate</code>, <code>email: String</code> a soukromý referenční atribut <code>ucty: List&lt;BankovniUcet&gt;</code>. Poskytuje veřejné operace (<code>+</code>) <code>pridejUcet(ucet: BankovniUcet): void</code>, <code>ziskejCelkovyZustatek(): BigDecimal</code> a <code>aktualizujEmail(novyEmail: String): boolean</code>.</li>
+        <li><strong>BankovniUcet</strong> (v tomto kroku zatím jako běžná konkrétní třída, nikoli abstraktní) obsahuje soukromé atributy (<code>-</code>) <code>cisloUctu: String</code>, <code>zustatek: BigDecimal</code>, <code>datumZalozeni: LocalDate</code> a <code>aktivni: boolean</code> a veřejné operace (<code>+</code>) <code>vloz(castka: BigDecimal): boolean</code>, <code>vyber(castka: BigDecimal): boolean</code>, <code>ziskejZustatek(): BigDecimal</code> a <code>zablokujUcet(): void</code>.</li>
+      </ul>
+      <p><strong>Váš úkol na plátně:</strong> Umístěte na plátno obě třídy (<code>Klient</code> a <code>BankovniUcet</code>) a propojte je <strong>asociací směřující z <code>Klient</code> na <code>BankovniUcet</code></strong> (šipka u <code>BankovniUcet</code>). Každý bankovní účet patří vždy právě jednomu klientovi (multiplicita <code>1</code> na straně <code>Klient</code>) a každý klient musí vlastnit alespoň jeden bankovní účet (multiplicita <code>1..*</code> a role <code>ucty</code> na straně <code>BankovniUcet</code>, odpovídající referenčnímu atributu <code>-ucty: List&lt;BankovniUcet&gt;</code> ve třídě <code>Klient</code>).</p>
     `,
     requirements: [
       'Umístěte na plátno konkrétní třídy <strong>Klient</strong> (včetně referenčního atributu <code>-ucty: List&lt;BankovniUcet&gt;</code>) a <strong>BankovniUcet</strong>.',
-      'Propojte je <strong>jednosměrnou řiditelnou asociací</strong> směřující z <code>Klient</code> na <code>BankovniUcet</code> (otevřená šipka u <code>BankovniUcet</code>).',
+      'Propojte je <strong>asociací</strong> směřující z <code>Klient</code> na <code>BankovniUcet</code> (šipka u <code>BankovniUcet</code>).',
       'Nastavte multiplicitu <code>1</code> na straně <code>Klient</code> a multiplicitu <code>1..*</code> s rolí <code>ucty</code> na straně <code>BankovniUcet</code>.'
     ],
     hints: [
@@ -928,7 +936,7 @@ const RAW_BANKA_SUBCHAPTERS = [
           targetMultiplicity: '1..*',
           targetRole: 'ucty',
           feedback: {
-            wrongType: 'Mezi třídami Klient a BankovniUcet použij jednosměrnou řiditelnou asociaci (otevřená šipka u BankovniUcet), nikoli obousměrnou asociaci (<-->).',
+            wrongType: 'Mezi třídami Klient a BankovniUcet použij asociaci se šipkou u BankovniUcet, nikoli obousměrnou asociaci (<-->).',
             wrongDirection: 'Šipka řiditelnosti musí směřovat od Klient (který drží referenční atribut ucty) k BankovniUcet.',
             wrongSourceMultiplicity: 'U vazby Klient → BankovniUcet nastav na straně Klient multiplicitu „1“ (každý bankovní účet patří právě jednomu klientovi).',
             wrongTargetMultiplicity: 'U vazby Klient → BankovniUcet zkontroluj multiplicitu na straně účtu (každý klient musí vlastnit alespoň jeden bankovní účet: 1..*).',
@@ -940,35 +948,37 @@ const RAW_BANKA_SUBCHAPTERS = [
   },
 
   // --------------------------------------------------------------------------
-  // Krok 2 (2.2): Řiditelnost asociací, role a referenční atributy
+  // Krok 2 (3.2): Řiditelnost asociací, role a referenční atributy
   // --------------------------------------------------------------------------
   {
     id: 'p-banka-02',
     order: 2,
-    title: '2.2 Řiditelnost asociací, role a referenční atributy',
-    shortTitle: '2.2 Transakce a Karta',
-    storyIntro: 'Na plátno se přenesly tvé třídy z minulého kroku a BankovniUcet získal referenční atribut transakce i soukromou operaci pridejTransakci. Zapoj evidenci transakcí a platebních karet.',
+    title: '3.2 Řiditelnost asociací, role a referenční atributy',
+    shortTitle: '3.2 Transakce a Karta',
+    storyIntro: 'Na plátno se přenesly tvé třídy z minulého kroku a BankovniUcet automaticky získal referenční atribut transakce i soukromou operaci pridejTransakci. Zapoj evidenci transakcí a platebních karet.',
     inheritPreviousCanvas: true,
     previousSubchapterId: 'p-banka-01',
     assignmentTitle: 'Banka 2/4: Řiditelnost asociací, role a referenční atributy',
     assignmentHtml: `
-      <p>Navazujte na svůj diagram z <strong>Podkapitoly 2.1</strong> a rozšiřte jej o evidenci transakcí, platebních karet a jednosměrně řiditelné asociace s rolemi navázanými na referenční atributy. Stávající třídy i vazbu <code>Klient → BankovniUcet</code> zachovejte a proveďte přesně následující úpravy a doplnění:</p>
+      <p><strong>Rozšíření modelu a nové třídy v paletě:</strong> Navazujete na svůj diagram z <strong>Podkapitoly 3.1</strong> (třídy <code>Klient</code> a <code>BankovniUcet</code> i jejich vazba zůstávají na plátně). Do stávající třídy <code>BankovniUcet</code> se automaticky promítl soukromý referenční atribut (<code>-</code>) <code>transakce: List&lt;Transakce&gt;</code> a soukromá operace <code>pridejTransakci(transakce: Transakce): void</code>. V paletě přibyly dvě nové konkrétní třídy:</p>
       <ul>
-        <li><strong>Úprava stávající třídy BankovniUcet:</strong> Doplňte soukromý referenční atribut (<code>-</code>) <code>transakce</code> typu <code>List&lt;Transakce&gt;</code> a soukromou operaci (<code>-</code>) <code>pridejTransakci</code> s parametrem <code>transakce</code> typu <code>Transakce</code> a návratovým typem <code>void</code> <em>(aktualizace se automaticky promítla na kartě třídy na plátně)</em>.</li>
-        <li><strong>Nová konkrétní třída Transakce:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>transakceId</code> typu <code>String</code>, <code>castka</code> typu <code>BigDecimal</code>, <code>typTransakce</code> typu <code>String</code>, <code>casProvedeni</code> typu <code>LocalDateTime</code> a referenčním atributem <code>pouzitaKarta</code> typu <code>PlatebniKarta</code>. Přidejte tři veřejné bezparametrické operace (<code>+</code>): <code>ziskejCastku</code> vracející <code>BigDecimal</code>, <code>ziskejCasProvedeni</code> vracející <code>LocalDateTime</code> a <code>jeKaretniTransakce</code> vracející <code>boolean</code>.</li>
-        <li><strong>Nová konkrétní třída PlatebniKarta:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>cisloKarty</code> typu <code>String</code>, <code>pinHash</code> typu <code>String</code>, <code>datumExpirace</code> typu <code>LocalDate</code>, <code>denniLimit</code> typu <code>BigDecimal</code> a <code>zablokovana</code> typu <code>boolean</code>. Přidejte čtyři veřejné operace (<code>+</code>): <code>overPin</code> s parametrem <code>zadanyPin</code> typu <code>String</code> vracející <code>boolean</code>, <code>zmenDenniLimit</code> s parametrem <code>novyLimit</code> typu <code>BigDecimal</code> vracející <code>boolean</code>, bezparametrickou operaci <code>zablokujKartu</code> vracející <code>void</code> a operaci <code>jePlatna</code> s parametrem <code>aktualniDatum</code> typu <code>LocalDate</code> vracející <code>boolean</code>.</li>
-        <li><strong>Nová vazba BankovniUcet → Transakce:</strong> Vytvořte <strong>jednosměrnou řiditelnou asociaci</strong> (v tomto kroku zatím bez kosočtverce) směřující z <code>BankovniUcet</code> na <code>Transakce</code> (otevřená šipka u <code>Transakce</code>). Na straně <code>BankovniUcet</code> uveďte multiplicitu <code>1</code>, na straně <code>Transakce</code> uveďte multiplicitu <code>0..*</code> a roli <code>transakce</code> (odpovídající atributu <code>-transakce: List&lt;Transakce&gt;</code>).</li>
-        <li><strong>Nová vazba Transakce → PlatebniKarta:</strong> Vytvořte <strong>jednosměrnou řiditelnou asociaci</strong> směřující z <code>Transakce</code> na <code>PlatebniKarta</code> (otevřená šipka u <code>PlatebniKarta</code>). Na straně <code>Transakce</code> uveďte multiplicitu <code>0..*</code>, na straně <code>PlatebniKarta</code> uveďte multiplicitu <code>0..1</code> a roli <code>pouzitaKarta</code> (odpovídající atributu <code>-pouzitaKarta: PlatebniKarta</code>).</li>
+        <li><strong>Transakce</strong> obsahuje soukromé atributy (<code>-</code>) <code>transakceId: String</code>, <code>castka: BigDecimal</code>, <code>typTransakce: String</code>, <code>casProvedeni: LocalDateTime</code>, soukromý referenční atribut <code>pouzitaKarta: PlatebniKarta</code> a veřejné operace (<code>+</code>) <code>ziskejCastku(): BigDecimal</code>, <code>ziskejCasProvedeni(): LocalDateTime</code> a <code>jeKaretniTransakce(): boolean</code>.</li>
+        <li><strong>PlatebniKarta</strong> obsahuje soukromé atributy (<code>-</code>) <code>cisloKarty: String</code>, <code>pinHash: String</code>, <code>datumExpirace: LocalDate</code>, <code>denniLimit: BigDecimal</code> a <code>zablokovana: boolean</code> a veřejné operace (<code>+</code>) <code>overPin(zadanyPin: String): boolean</code>, <code>zmenDenniLimit(novyLimit: BigDecimal): boolean</code>, <code>zablokujKartu(): void</code> a <code>jePlatna(aktualniDatum: LocalDate): boolean</code>.</li>
+      </ul>
+      <p><strong>Váš úkol na plátně:</strong> Zachovejte stávající třídy a vazbu <code>Klient → BankovniUcet</code>, přidejte z palety třídy <code>Transakce</code> a <code>PlatebniKarta</code> a vytvořte dvě nové asociace:</p>
+      <ul>
+        <li><strong>BankovniUcet → Transakce:</strong> Vytvořte asociaci (v tomto kroku zatím bez kosočtverce) směřující z <code>BankovniUcet</code> na <code>Transakce</code> (šipka u <code>Transakce</code>) s multiplicitou <code>1</code> na straně <code>BankovniUcet</code> a multiplicitou <code>0..*</code> a rolí <code>transakce</code> na straně <code>Transakce</code> (odpovídající referenčnímu atributu <code>-transakce: List&lt;Transakce&gt;</code>).</li>
+        <li><strong>Transakce → PlatebniKarta:</strong> Vytvořte asociaci směřující z <code>Transakce</code> na <code>PlatebniKarta</code> (šipka u <code>PlatebniKarta</code>) s multiplicitou <code>0..*</code> na straně <code>Transakce</code> a multiplicitou <code>0..1</code> a rolí <code>pouzitaKarta</code> na straně <code>PlatebniKarta</code> (odpovídající referenčnímu atributu <code>-pouzitaKarta: PlatebniKarta</code>).</li>
       </ul>
     `,
     requirements: [
-      'Zachovejte stávající třídy <code>Klient</code>, <code>BankovniUcet</code> (aktualizovaný o <code>-transakce: List&lt;Transakce&gt;</code>) i jejich jednosměrnou řiditelnou asociaci <code>Klient (1)</code> → <code>BankovniUcet (1..*, role: ucty)</code>.',
+      'Zachovejte stávající třídy <code>Klient</code>, <code>BankovniUcet</code> (aktualizovaný o <code>-transakce: List&lt;Transakce&gt;</code>) i jejich asociaci <code>Klient (1)</code> → <code>BankovniUcet (1..*, role: ucty)</code>.',
       'Přidejte z palety nové třídy <strong>Transakce</strong> (s referenčním atributem <code>-pouzitaKarta: PlatebniKarta</code>) a <strong>PlatebniKarta</strong>.',
-      'Vytvořte jednosměrnou řiditelnou asociaci <code>BankovniUcet (1)</code> → <code>Transakce (0..*, role: transakce)</code> (zatím bez kosočtverce).',
-      'Vytvořte jednosměrnou řiditelnou asociaci <code>Transakce (0..*)</code> → <code>PlatebniKarta (0..1, role: pouzitaKarta)</code>.'
+      'Vytvořte asociaci <code>BankovniUcet (1)</code> → <code>Transakce (0..*, role: transakce)</code> (zatím bez kosočtverce).',
+      'Vytvořte asociaci <code>Transakce (0..*)</code> → <code>PlatebniKarta (0..1, role: pouzitaKarta)</code>.'
     ],
     hints: [
-      'V tomto kroku je vazba BankovniUcet → Transakce záměrně ještě jednosměrnou asociací bez kosočtverce; na kompozici ji zpřesníme v kroku 2.3. Cílové role transakce a pouzitaKarta odpovídají referenčním atributům ve zdrojových třídách.'
+      'V tomto kroku (3.2) je vazba BankovniUcet → Transakce záměrně ještě asociací bez kosočtverce; na kompozici ji zpřesníme v kroku 3.3. Cílové role transakce a pouzitaKarta odpovídají referenčním atributům ve zdrojových třídách.'
     ],
     classes: [
       BANKA_CLASS_KLIENT,
@@ -1002,7 +1012,7 @@ const RAW_BANKA_SUBCHAPTERS = [
           targetMultiplicity: '0..*',
           targetRole: 'transakce',
           feedback: {
-            wrongType: 'V tomto kroku (2.2) modeluj vazbu BankovniUcet → Transakce zatím jako jednosměrnou řiditelnou asociaci bez kosočtverce.',
+            wrongType: 'V tomto kroku (3.2) modeluj vazbu BankovniUcet → Transakce zatím jako asociaci bez kosočtverce.',
             wrongTargetRole: 'U vazby BankovniUcet → Transakce doplň na straně Transakce roli „transakce“ odpovídající referenčnímu atributu -transakce: List<Transakce>.'
           }
         },
@@ -1026,36 +1036,39 @@ const RAW_BANKA_SUBCHAPTERS = [
   },
 
   // --------------------------------------------------------------------------
-  // Krok 3 (2.3): Vazby celek–část (agregace a kompozice)
+  // Krok 3 (3.3): Vazby celek–část (agregace a kompozice)
   // --------------------------------------------------------------------------
   {
     id: 'p-banka-03',
     order: 3,
-    title: '2.3 Vazby celek–část (agregace a kompozice)',
-    shortTitle: '2.3 Banka, Pobočka a kompozice',
+    title: '3.3 Vazby celek–část (agregace a kompozice)',
+    shortTitle: '3.3 Banka, Pobočka a kompozice',
     storyIntro: 'Je čas přidat organizační páteř banky! Doplň třídy Banka a Pobocka, rozliš životní cyklus poboček a klientů a zpřesni vazbu účtu k transakcím na kompozici.',
     inheritPreviousCanvas: true,
     previousSubchapterId: 'p-banka-02',
     assignmentTitle: 'Banka 3/4: Vazby celek–část (agregace a kompozice)',
     assignmentHtml: `
-      <p>Navazujte na svůj diagram z <strong>Podkapitoly 2.2</strong> a doplňte organizační strukturu banky společně s vazbami typu celek–část (agregace a kompozice). Všechny dosavadní prvky z předchozího kroku zachovejte a proveďte přesně následující změny (cílová role každé vazby ukazuje na odpovídající referenční atribut ve zdrojové třídě):</p>
+      <p><strong>Připravené třídy v paletě:</strong> Navazujete na svůj diagram z <strong>Podkapitoly 3.2</strong>. V paletě jsou nově připraveny dvě konkrétní třídy organizační struktury banky:</p>
       <ul>
-        <li><strong>Nová konkrétní třída Banka:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>nazev</code> typu <code>String</code>, <code>kodBanky</code> typu <code>String</code>, <code>swiftKod</code> typu <code>String</code> a referenčním atributem <code>pobocky</code> typu <code>List&lt;Pobocka&gt;</code>. Přidejte tři veřejné operace (<code>+</code>): <code>pridejPobocku</code> s parametrem <code>pobocka</code> typu <code>Pobocka</code> vracející <code>void</code>, <code>najdiPobocku</code> s parametrem <code>kodPobocky</code> typu <code>String</code> vracející <code>Pobocka</code> a bezparametrickou operaci <code>ziskejPocetPobocek</code> vracející <code>int</code>.</li>
-        <li><strong>Nová konkrétní třída Pobocka:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>kodPobocky</code> typu <code>String</code>, <code>adresa</code> typu <code>String</code>, <code>mesto</code> typu <code>String</code> a referenčním atributem <code>kmenoviKlienti</code> typu <code>List&lt;Klient&gt;</code>. Přidejte tři veřejné operace (<code>+</code>): <code>priradKlienta</code> s parametrem <code>klient</code> typu <code>Klient</code> vracející <code>void</code>, <code>odeberKlienta</code> s parametrem <code>klientId</code> typu <code>String</code> vracející <code>boolean</code> a <code>najdiKlienta</code> s parametrem <code>klientId</code> typu <code>String</code> vracející <code>Klient</code>.</li>
-        <li><strong>Nová kompozice Banka ◆→ Pobocka:</strong> Pobočka je existenčně závislou součástí banky a zaniká společně s ní. Vytvořte <strong>jednosměrnou řiditelnou kompozici</strong> z celku <code>Banka</code> (plný kosočtverec u <code>Banka</code>) k části <code>Pobocka</code> (šipka u <code>Pobocka</code>). Na straně <code>Banka</code> uveďte multiplicitu <code>1</code>, na straně <code>Pobocka</code> uveďte multiplicitu <code>1..*</code> a roli <code>pobocky</code> (odpovídající atributu <code>-pobocky: List&lt;Pobocka&gt;</code>).</li>
-        <li><strong>Nová agregace Pobocka ◇→ Klient:</strong> Pobočka sdružuje své kmenové klienty s nezávislým životním cyklem (při zrušení pobočky klienti nezanikají). Vytvořte <strong>jednosměrnou řiditelnou agregaci</strong> z celku <code>Pobocka</code> (prázdný kosočtverec u <code>Pobocka</code>) k části <code>Klient</code> (šipka u <code>Klient</code>). Na straně <code>Pobocka</code> uveďte multiplicitu <code>0..1</code>, na straně <code>Klient</code> uveďte multiplicitu <code>0..*</code> a roli <code>kmenoviKlienti</code> (odpovídající atributu <code>-kmenoviKlienti: List&lt;Klient&gt;</code>).</li>
-        <li><strong>Zpřesnění stávající vazby BankovniUcet → Transakce:</strong> Transakční záznamy jsou nedílnou součástí účtu a při jeho zrušení zanikají s ním. Změňte typ této stávající jednosměrné asociace na <strong>jednosměrnou řiditelnou kompozici</strong> (doplňte plný kosočtverec na stranu <code>BankovniUcet</code>); směr šipky k <code>Transakce</code>, multiplicity (<code>1</code> a <code>0..*</code>) i roli <code>transakce</code> ponechte beze změny.</li>
+        <li><strong>Banka</strong> obsahuje soukromé atributy (<code>-</code>) <code>nazev: String</code>, <code>kodBanky: String</code>, <code>swiftKod: String</code>, soukromý referenční atribut <code>pobocky: List&lt;Pobocka&gt;</code> a veřejné operace (<code>+</code>) <code>pridejPobocku(pobocka: Pobocka): void</code>, <code>najdiPobocku(kodPobocky: String): Pobocka</code> a <code>ziskejPocetPobocek(): int</code>.</li>
+        <li><strong>Pobocka</strong> obsahuje soukromé atributy (<code>-</code>) <code>kodPobocky: String</code>, <code>adresa: String</code>, <code>mesto: String</code>, soukromý referenční atribut <code>kmenoviKlienti: List&lt;Klient&gt;</code> a veřejné operace (<code>+</code>) <code>priradKlienta(klient: Klient): void</code>, <code>odeberKlienta(klientId: String): boolean</code> a <code>najdiKlienta(klientId: String): Klient</code>.</li>
+      </ul>
+      <p><strong>Váš úkol na plátně:</strong> Zachovejte všechny dosavadní třídy a vazby z kroku 3.2, přidejte z palety třídy <code>Banka</code> a <code>Pobocka</code> a vytvořte či upravte následující vazby typu celek–část:</p>
+      <ul>
+        <li><strong>Kompozice Banka ◆→ Pobocka:</strong> Pobočka je existenčně závislou součástí banky a zaniká společně s ní. Vytvořte <strong>kompozici</strong> z celku <code>Banka</code> (plný kosočtverec u <code>Banka</code>) k části <code>Pobocka</code> (šipka u <code>Pobocka</code>) s multiplicitou <code>1</code> na straně <code>Banka</code> a multiplicitou <code>1..*</code> a rolí <code>pobocky</code> na straně <code>Pobocka</code> (odpovídající atributu <code>-pobocky: List&lt;Pobocka&gt;</code>).</li>
+        <li><strong>Agregace Pobocka ◇→ Klient:</strong> Pobočka sdružuje své kmenové klienty s nezávislým životním cyklem (při zrušení pobočky klienti nezanikají). Vytvořte <strong>agregaci</strong> z celku <code>Pobocka</code> (prázdný kosočtverec u <code>Pobocka</code>) k části <code>Klient</code> (šipka u <code>Klient</code>) s multiplicitou <code>0..1</code> na straně <code>Pobocka</code> a multiplicitou <code>0..*</code> a rolí <code>kmenoviKlienti</code> na straně <code>Klient</code> (odpovídající atributu <code>-kmenoviKlienti: List&lt;Klient&gt;</code>).</li>
+        <li><strong>Zpřesnění stávající vazby BankovniUcet → Transakce:</strong> Transakční záznamy jsou nedílnou součástí účtu a při jeho zrušení zanikají s ním. Klikněte na tuto stávající vazbu a změňte její typ z asociace na <strong>kompozici</strong> (plný kosočtverec na straně <code>BankovniUcet</code>); směr šipky k <code>Transakce</code>, multiplicity (<code>1</code> a <code>0..*</code>) i roli <code>transakce</code> ponechte beze změny.</li>
       </ul>
     `,
     requirements: [
-      'Zachovejte stávající 4 třídy i vazby <code>Klient → BankovniUcet</code> a <code>Transakce → PlatebniKarta</code>.',
+      'Zachovejte stávající 4 třídy z kroku 3.2 i vazby <code>Klient → BankovniUcet</code> a <code>Transakce → PlatebniKarta</code>.',
       'Přidejte z palety nové třídy <strong>Banka</strong> (s referenčním atributem <code>-pobocky: List&lt;Pobocka&gt;</code>) a <strong>Pobocka</strong> (s referenčním atributem <code>-kmenoviKlienti: List&lt;Klient&gt;</code>).',
-      'Vytvořte jednosměrnou řiditelnou <strong>kompozici</strong> <code>Banka (1)</code> ◆→ <code>Pobocka (1..*, role: pobocky)</code>.',
-      'Vytvořte jednosměrnou řiditelnou <strong>agregaci</strong> <code>Pobocka (0..1)</code> ◇→ <code>Klient (0..*, role: kmenoviKlienti)</code>.',
-      'Klikněte na existující vazbu <code>BankovniUcet → Transakce</code> a změňte její typ na jednosměrnou řiditelnou <strong>kompozici</strong> (plný kosočtverec u <code>BankovniUcet</code>).'
+      'Vytvořte <strong>kompozici</strong> <code>Banka (1)</code> ◆→ <code>Pobocka (1..*, role: pobocky)</code>.',
+      'Vytvořte <strong>agregaci</strong> <code>Pobocka (0..1)</code> ◇→ <code>Klient (0..*, role: kmenoviKlienti)</code>.',
+      'Klikněte na existující vazbu <code>BankovniUcet → Transakce</code> a změňte její typ na <strong>kompozici</strong> (plný kosočtverec u <code>BankovniUcet</code>).'
     ],
     hints: [
-      'Nezapomeňte kliknout na stávající vazbu BankovniUcet → Transakce a přepnout ji z jednosměrné asociace na jednosměrnou kompozici (◆──>).'
+      'Nezapomeňte kliknout na stávající vazbu BankovniUcet → Transakce a přepnout ji z asociace na kompozici (◆──>).'
     ],
     classes: [
       BANKA_CLASS_BANKA,
@@ -1087,7 +1100,7 @@ const RAW_BANKA_SUBCHAPTERS = [
           targetMultiplicity: '1..*',
           targetRole: 'pobocky',
           feedback: {
-            wrongType: 'Vazba mezi třídami Banka a Pobocka má nastavený jiný typ, ale pobočka nemůže existovat bez banky – použij jednosměrnou řiditelnou kompozici (plný kosočtverec).',
+            wrongType: 'Vazba mezi třídami Banka a Pobocka má nastavený jiný typ, ale pobočka nemůže existovat bez banky – použij kompozici (plný kosočtverec).',
             wrongSourceMultiplicity: 'U kompozice Banka ◆→ Pobocka musí být na straně celku (Banka) multiplicita „1“.',
             wrongTargetMultiplicity: 'Banka musí provozovat alespoň jednu pobočku – na straně Pobocka uveď multiplicitu „1..*“.',
             wrongTargetRole: 'U kompozice Banka ◆→ Pobocka uveď na straně Pobocka roli „pobocky“ odpovídající referenčnímu atributu -pobocky: List<Pobocka>.'
@@ -1104,7 +1117,7 @@ const RAW_BANKA_SUBCHAPTERS = [
           targetMultiplicity: '0..*',
           targetRole: 'kmenoviKlienti',
           feedback: {
-            wrongType: 'Při zrušení pobočky klienti nezanikají (mají nezávislý životní cyklus) – mezi Pobocka a Klient použij jednosměrnou řiditelnou agregaci (prázdný kosočtverec).',
+            wrongType: 'Při zrušení pobočky klienti nezanikají (mají nezávislý životní cyklus) – mezi Pobocka a Klient použij agregaci (prázdný kosočtverec).',
             wrongSourceMultiplicity: 'U agregace Pobocka ◇→ Klient uveď na straně Pobocka multiplicitu „0..1“ (klient může existovat i bez kmenové pobočky).',
             wrongTargetRole: 'U agregace Pobocka ◇→ Klient uveď na straně Klient roli „kmenoviKlienti“ odpovídající referenčnímu atributu -kmenoviKlienti: List<Klient>.'
           }
@@ -1131,7 +1144,7 @@ const RAW_BANKA_SUBCHAPTERS = [
           targetMultiplicity: '0..*',
           targetRole: 'transakce',
           feedback: {
-            wrongType: 'Stávající vazbu BankovniUcet → Transakce je v tomto kroku nutné zpřesnit z jednosměrné asociace na jednosměrnou řiditelnou kompozici (plný kosočtverec u BankovniUcet).',
+            wrongType: 'Stávající vazbu BankovniUcet → Transakce je v kroku 3.3 nutné zpřesnit z asociace na kompozici (plný kosočtverec u BankovniUcet).',
             wrongTargetRole: 'U kompozice BankovniUcet ◆→ Transakce ponech na straně Transakce roli „transakce“ odpovídající referenčnímu atributu -transakce: List<Transakce>.'
           }
         },
@@ -1151,36 +1164,38 @@ const RAW_BANKA_SUBCHAPTERS = [
   },
 
   // --------------------------------------------------------------------------
-  // Krok 4 (2.4): Generalizace, abstraktní třída a finální podoba diagramu
+  // Krok 4 (3.4): Generalizace, abstraktní třída a finální podoba diagramu
   // --------------------------------------------------------------------------
   {
     id: 'p-banka-04',
     order: 4,
-    title: '2.4 Generalizace, abstraktní třída a finální podoba diagramu',
-    shortTitle: '2.4 Hierarchie účtů a karta',
-    storyIntro: 'Poslední krok bankovní architektury! BankovniUcet se proměnil v abstraktní nadtřídu s chráněnými prvky (#). Připoj konkrétní podtřídy BeznyUcet a SporiciUcet a napoj vydávání platební karty k běžnému účtu.',
+    title: '3.4 Generalizace, abstraktní třída a finální podoba diagramu',
+    shortTitle: '3.4 Hierarchie účtů a karta',
+    storyIntro: 'Poslední krok bankovní architektury! BankovniUcet se automaticky proměnil v abstraktní nadtřídu s chráněnými prvky (#). Připoj konkrétní podtřídy BeznyUcet a SporiciUcet a napoj vydávání platební karty k běžnému účtu.',
     inheritPreviousCanvas: true,
     previousSubchapterId: 'p-banka-03',
     assignmentTitle: 'Banka 4/4: Generalizace, abstraktní třída a finální podoba diagramu',
     assignmentHtml: `
-      <p>Navazujte na svůj diagram z <strong>Podkapitoly 2.3</strong> a dokončete jej do finální celistvé podoby zavedením abstraktní nadtřídy, dědičné hierarchie typů účtů a vazby pro vydávání platebních karet. Všechny ostatní dosavadní třídy, referenční atributy a vazby zachovejte beze změny a proveďte přesně tyto úpravy:</p>
+      <p><strong>Refaktoring modelu a nové podtřídy v paletě:</strong> Navazujete na svůj diagram z <strong>Podkapitoly 3.3</strong>. Třída <code>BankovniUcet</code> na plátně byla automaticky převedena na <strong>abstraktní nadtřídu</strong> (<code>abstract</code>): atributy <code>zustatek</code> a <code>aktivni</code> i pomocná operace <code>pridejTransakci</code> získaly chráněnou viditelnost (<code>#</code>) pro potomky a veřejná operace <code>+vyber(castka: BigDecimal): boolean</code> je nyní abstraktní (<code>{abstract}</code>). V paletě jsou nově připraveny dvě konkrétní specializace účtů:</p>
       <ul>
-        <li><strong>Refaktoring třídy BankovniUcet:</strong> Změňte třídu <code>BankovniUcet</code> na <strong>abstraktní třídu</strong> (<code>abstract</code>). Změňte viditelnost atributů <code>zustatek</code> (<code>BigDecimal</code>) a <code>aktivni</code> (<code>boolean</code>) ze soukromé (<code>-</code>) na chráněnou (<code>#</code>) (atributy <code>cisloUctu</code>, <code>datumZalozeni</code> a referenční atribut <code>transakce</code> zůstávají soukromé <code>-</code>). Označte veřejnou operaci <code>+vyber(castka: BigDecimal): boolean</code> jako abstraktní (<code>{abstract}</code>). Změňte viditelnost operace <code>pridejTransakci(transakce: Transakce): void</code> ze soukromé (<code>-</code>) na chráněnou (<code>#</code>) <em>(refaktoring třídy se automaticky projevil na tvém plátně)</em>.</li>
-        <li><strong>Nová konkrétní podtřída BeznyUcet:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>kontokorentLimit</code> typu <code>BigDecimal</code>, <code>mesicniPoplatek</code> typu <code>BigDecimal</code> a soukromým referenčním atributem <code>platebniKarta</code> typu <code>PlatebniKarta</code>. Přidejte čtyři veřejné operace (<code>+</code>): <code>vyber</code> s parametrem <code>castka</code> typu <code>BigDecimal</code> vracející <code>boolean</code>, <code>vyberKartou</code> s parametry <code>castka</code> typu <code>BigDecimal</code> a <code>pin</code> typu <code>String</code> vracející <code>boolean</code>, <code>nastavKontokorent</code> s parametrem <code>novyLimit</code> typu <code>BigDecimal</code> vracející <code>boolean</code> a <code>vystavKartu</code> s parametry <code>cisloKarty</code> typu <code>String</code>, <code>pinHash</code> typu <code>String</code> a <code>denniLimit</code> typu <code>BigDecimal</code> vracející <code>PlatebniKarta</code>. Dále přidejte jednu soukromou pomocnou operaci (<code>-</code>) <code>overDostupnyZustatek</code> s parametrem <code>castka</code> typu <code>BigDecimal</code> vracející <code>boolean</code>.</li>
-        <li><strong>Nová konkrétní podtřída SporiciUcet:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>urokovaSazba</code> typu <code>double</code> a <code>minimalniZustatek</code> typu <code>BigDecimal</code>. Přidejte tři veřejné operace (<code>+</code>): <code>vyber</code> s parametrem <code>castka</code> typu <code>BigDecimal</code> vracející <code>boolean</code>, bezparametrickou operaci <code>pripisUrok</code> vracející <code>BigDecimal</code> a operaci <code>zmenUrokovouSazbu</code> s parametrem <code>novaSazba</code> typu <code>double</code> vracející <code>void</code>.</li>
-        <li><strong>Nové vazby generalizace:</strong> Napojte obě nové podtřídy na abstraktní nadtřídu <code>BankovniUcet</code> pomocí <strong>dvou vazeb generalizace</strong> (plná čára s prázdnou trojúhelníkovou šipkou směřující k <code>BankovniUcet</code>): <code>BeznyUcet</code> dědí z <code>BankovniUcet</code> a <code>SporiciUcet</code> dědí z <code>BankovniUcet</code>.</li>
-        <li><strong>Nová kompozice BeznyUcet ◆→ PlatebniKarta:</strong> Platební kartu lze vydat výhradně k běžnému účtu, na němž je existenčně závislá a při jeho zrušení zaniká. Vytvořte <strong>jednosměrnou řiditelnou kompozici</strong> z celku <code>BeznyUcet</code> (plný kosočtverec u <code>BeznyUcet</code>) k části <code>PlatebniKarta</code> (šipka u <code>PlatebniKarta</code>). Na straně <code>BeznyUcet</code> uveďte multiplicitu <code>1</code>, na straně <code>PlatebniKarta</code> uveďte multiplicitu <code>0..1</code> a roli <code>platebniKarta</code> (odpovídající referenčnímu atributu <code>-platebniKarta: PlatebniKarta</code> ve třídě <code>BeznyUcet</code>).</li>
+        <li><strong>BeznyUcet</strong> obsahuje soukromé atributy (<code>-</code>) <code>kontokorentLimit: BigDecimal</code>, <code>mesicniPoplatek: BigDecimal</code>, soukromý referenční atribut <code>platebniKarta: PlatebniKarta</code>, veřejné operace (<code>+</code>) <code>vyber(castka: BigDecimal): boolean</code>, <code>vyberKartou(castka: BigDecimal, pin: String): boolean</code>, <code>nastavKontokorent(novyLimit: BigDecimal): boolean</code> a <code>vystavKartu(cisloKarty: String, pinHash: String, denniLimit: BigDecimal): PlatebniKarta</code> a soukromou pomocnou operaci (<code>-</code>) <code>overDostupnyZustatek(castka: BigDecimal): boolean</code>.</li>
+        <li><strong>SporiciUcet</strong> obsahuje soukromé atributy (<code>-</code>) <code>urokovaSazba: double</code> a <code>minimalniZustatek: BigDecimal</code> a veřejné operace (<code>+</code>) <code>vyber(castka: BigDecimal): boolean</code>, <code>pripisUrok(): BigDecimal</code> a <code>zmenUrokovouSazbu(novaSazba: double): void</code>.</li>
+      </ul>
+      <p><strong>Váš úkol na plátně:</strong> Zachovejte všech 6 dosavadních tříd a všech 5 vazeb z kroku 3.3, přidejte z palety konkrétní podtřídy <code>BeznyUcet</code> a <code>SporiciUcet</code> a vytvořte tři nové vazby:</p>
+      <ul>
+        <li><strong>Dvě vazby generalizace:</strong> Napojte obě nové podtřídy na abstraktní nadtřídu <code>BankovniUcet</code> (plná čára s prázdným trojúhelníkem směřujícím k <code>BankovniUcet</code>, bez multiplicit a rolí): <code>BeznyUcet</code> dědí z <code>BankovniUcet</code> a <code>SporiciUcet</code> dědí z <code>BankovniUcet</code>.</li>
+        <li><strong>Kompozice BeznyUcet ◆→ PlatebniKarta:</strong> Platební kartu lze vydat výhradně k běžnému účtu, na němž je existenčně závislá a při jeho zrušení zaniká. Vytvořte <strong>kompozici</strong> z celku <code>BeznyUcet</code> (plný kosočtverec u <code>BeznyUcet</code>) k části <code>PlatebniKarta</code> (šipka u <code>PlatebniKarta</code>) s multiplicitou <code>1</code> na straně <code>BeznyUcet</code> a multiplicitou <code>0..1</code> a rolí <code>platebniKarta</code> na straně <code>PlatebniKarta</code> (odpovídající referenčnímu atributu <code>-platebniKarta: PlatebniKarta</code> ve třídě <code>BeznyUcet</code>).</li>
       </ul>
     `,
     requirements: [
-      'Zachovejte všech 6 dosavadních tříd (včetně aktualizované abstraktní třídy <code>BankovniUcet</code>) a všech 5 vazeb z kroku 2.3.',
+      'Zachovejte všech 6 dosavadních tříd (včetně aktualizované abstraktní třídy <code>BankovniUcet</code>) a všech 5 vazeb z kroku 3.3.',
       'Přidejte z palety konkrétní podtřídy <strong>BeznyUcet</strong> (s referenčním atributem <code>-platebniKarta: PlatebniKarta</code>) a <strong>SporiciUcet</strong>.',
       'Vytvořte vazbu <strong>generalizace</strong> od <code>BeznyUcet</code> (potomek) k <code>BankovniUcet</code> (rodič) bez multiplicit a rolí.',
       'Vytvořte vazbu <strong>generalizace</strong> od <code>SporiciUcet</code> (potomek) k <code>BankovniUcet</code> (rodič) bez multiplicit a rolí.',
-      'Vytvořte jednosměrnou řiditelnou <strong>kompozici</strong> <code>BeznyUcet (1)</code> ◆→ <code>PlatebniKarta (0..1, role: platebniKarta)</code>.'
+      'Vytvořte <strong>kompozici</strong> <code>BeznyUcet (1)</code> ◆→ <code>PlatebniKarta (0..1, role: platebniKarta)</code>.'
     ],
     hints: [
-      'Nezapomeňte kromě obou generalizací doplnit také jednosměrnou kompozici BeznyUcet (1) ◆→ PlatebniKarta (0..1, role platebniKarta odpovídající atributu -platebniKarta: PlatebniKarta).'
+      'Nezapomeňte kromě obou generalizací doplnit také kompozici BeznyUcet (1) ◆→ PlatebniKarta (0..1, role platebniKarta odpovídající atributu -platebniKarta: PlatebniKarta).'
     ],
     classes: [
       BANKA_CLASS_BANKA,
@@ -1280,7 +1295,7 @@ const RAW_BANKA_SUBCHAPTERS = [
           targetMultiplicity: '0..1',
           targetRole: 'platebniKarta',
           feedback: {
-            wrongType: 'Platební karta je existenčně vázána na běžný účet – mezi BeznyUcet a PlatebniKarta použij jednosměrnou řiditelnou kompozici (plný kosočtverec u BeznyUcet).',
+            wrongType: 'Platební karta je existenčně vázána na běžný účet – mezi BeznyUcet a PlatebniKarta použij kompozici (plný kosočtverec u BeznyUcet).',
             wrongSourceMultiplicity: 'U kompozice BeznyUcet ◆→ PlatebniKarta musí být na straně celku (BeznyUcet) multiplicita „1“.',
             wrongTargetMultiplicity: 'K běžnému účtu lze vydat nejvýše jednu platební kartu (nebo žádnou) – na straně PlatebniKarta uveď multiplicitu „0..1“.',
             wrongTargetRole: 'U kompozice BeznyUcet ◆→ PlatebniKarta uveď na straně PlatebniKarta roli „platebniKarta“ odpovídající referenčnímu atributu -platebniKarta: PlatebniKarta.'
@@ -1545,26 +1560,28 @@ const GEO_CLASS_OBDELNIK = {
 
 const RAW_GEOMETRIE_SUBCHAPTERS = [
   // --------------------------------------------------------------------------
-  // Krok 1 (2.1): Základní třídy, zapouzdření a řiditelná asociace s multiplicitami
+  // Krok 1 (4.1): Základní třídy, zapouzdření a asociace s multiplicitami
   // --------------------------------------------------------------------------
   {
     id: 'p-geo-01',
     order: 1,
-    title: '2.1 Základní třídy, zapouzdření a řiditelná asociace s multiplicitami',
-    shortTitle: '2.1 Tvar a Styl',
-    storyIntro: 'Vítej v ateliéru vektorové grafiky! Nejprve založíme jádro grafického editoru: propojíme geometrický tvar s jeho vizuálním stylem pomocí jednosměrné řiditelné asociace.',
+    title: '4.1 Základní třídy, zapouzdření a asociace s multiplicitami',
+    shortTitle: '4.1 Tvar a Styl',
+    storyIntro: 'Vítej v ateliéru vektorové grafiky! Nejprve založíme jádro grafického editoru: propojíme geometrický tvar s jeho vizuálním stylem pomocí asociace se šipkou.',
     inheritPreviousCanvas: false,
     previousSubchapterId: null,
-    assignmentTitle: 'Geometrie 1/4: Základní třídy, zapouzdření a řiditelná asociace s multiplicitami',
+    assignmentTitle: 'Geometrie 1/4: Základní třídy, zapouzdření a asociace s multiplicitami',
     assignmentHtml: `
-      <p>Vytvořte výchozí návrhový diagram tříd (UML 2.5) pro doménu <strong>Geometrie (Malování)</strong> určený pro implementaci v jazyce Java. Diagram v tomto prvním kroku obsahuje <strong>přesně dvě konkrétní třídy propojené jednou jednosměrnou řiditelnou asociací</strong>. Každá řiditelná vazba je ve zdrojové třídě realizována soukromým referenčním atributem, na který ukazuje cílová role; nemodelujte konstruktory ani žádné nespecifikované atributy či metody.</p>
-      <p>Vytvořte konkrétní třídu <strong>Tvar</strong> (v tomto kroku zatím jako běžnou konkrétní třídu, nikoli abstraktní) se všemi atributy soukromými (<code>-</code>): <code>tvarId</code> typu <code>String</code>, <code>rotaceStupne</code> typu <code>double</code>, <code>viditelny</code> typu <code>boolean</code> a referenčním atributem <code>styl</code> typu <code>Styl</code>. Třída poskytuje šest veřejných operací (<code>+</code>): bezparametrické operace <code>vypoctiObsah</code> vracející <code>double</code>, <code>vypoctiObvod</code> vracející <code>double</code> a <code>vykresli</code> vracející <code>void</code>, dále operaci <code>posun</code> s parametry <code>dx</code> typu <code>double</code> a <code>dy</code> typu <code>double</code> vracející <code>void</code>, operaci <code>otoc</code> s parametrem <code>uhelStupne</code> typu <code>double</code> vracející <code>void</code> a operaci <code>priradStyl</code> s parametrem <code>styl</code> typu <code>Styl</code> vracející <code>void</code>. Dále obsahuje jednu soukromou pomocnou operaci (<code>-</code>) <code>normalizujUhel</code> s parametrem <code>uhel</code> typu <code>double</code> vracející <code>double</code>.</p>
-      <p>Vytvořte konkrétní třídu <strong>Styl</strong> se všemi atributy soukromými (<code>-</code>): <code>stylId</code> typu <code>String</code>, <code>barvaVyplne</code> typu <code>String</code>, <code>barvaObrysu</code> typu <code>String</code>, <code>tloustkaObrysu</code> typu <code>double</code> a <code>pruhlednost</code> typu <code>double</code>. Třída poskytuje tři veřejné operace (<code>+</code>): <code>zmenBarvuVyplne</code> s parametrem <code>hexBarva</code> typu <code>String</code> vracející <code>boolean</code>, <code>zmenBarvuObrysu</code> s parametrem <code>hexBarva</code> typu <code>String</code> vracející <code>boolean</code> a <code>nastavTloustkuObrysu</code> s parametrem <code>tloustka</code> typu <code>double</code> vracející <code>boolean</code>. Dále obsahuje jednu soukromou validační operaci (<code>-</code>) <code>jePlatnaHexBarva</code> s parametrem <code>hexBarva</code> typu <code>String</code> vracející <code>boolean</code>.</p>
-      <p>Třídy <strong>Tvar</strong> a <strong>Styl</strong> propojte <strong>jednosměrnou řiditelnou asociací</strong> směřující z <code>Tvar</code> na <code>Styl</code> (otevřená šipka u <code>Styl</code>). Jeden styl může používat libovolný počet tvarů nebo žádný (multiplicita <code>0..*</code> na straně <code>Tvar</code>) a každý tvar může mít přiřazen nejvýše jeden styl nebo žádný (multiplicita <code>0..1</code> a role <code>styl</code> na straně <code>Styl</code>, odpovídající referenčnímu atributu <code>-styl: Styl</code> ve třídě <code>Tvar</code>).</p>
+      <p><strong>Připravený model v paletě:</strong> Pro výchozí krok domény <strong>Geometrie (Malování)</strong> máte v paletě připraveny dvě konkrétní návrhové třídy pro jazyk Java:</p>
+      <ul>
+        <li><strong>Tvar</strong> (v tomto kroku zatím jako běžná konkrétní třída, nikoli abstraktní) obsahuje soukromé atributy (<code>-</code>) <code>tvarId: String</code>, <code>rotaceStupne: double</code>, <code>viditelny: boolean</code>, soukromý referenční atribut <code>styl: Styl</code>, veřejné operace (<code>+</code>) <code>vypoctiObsah(): double</code>, <code>vypoctiObvod(): double</code>, <code>vykresli(): void</code>, <code>posun(dx: double, dy: double): void</code>, <code>otoc(uhelStupne: double): void</code> a <code>priradStyl(styl: Styl): void</code> a soukromou pomocnou operaci (<code>-</code>) <code>normalizujUhel(uhel: double): double</code>.</li>
+        <li><strong>Styl</strong> obsahuje soukromé atributy (<code>-</code>) <code>stylId: String</code>, <code>barvaVyplne: String</code>, <code>barvaObrysu: String</code>, <code>tloustkaObrysu: double</code> a <code>pruhlednost: double</code>, veřejné operace (<code>+</code>) <code>zmenBarvuVyplne(hexBarva: String): boolean</code>, <code>zmenBarvuObrysu(hexBarva: String): boolean</code> a <code>nastavTloustkuObrysu(tloustka: double): boolean</code> a soukromou validační operaci (<code>-</code>) <code>jePlatnaHexBarva(hexBarva: String): boolean</code>.</li>
+      </ul>
+      <p><strong>Váš úkol na plátně:</strong> Umístěte na plátno obě třídy (<code>Tvar</code> a <code>Styl</code>) a propojte je <strong>asociací směřující z <code>Tvar</code> na <code>Styl</code></strong> (šipka u <code>Styl</code>). Jeden styl může používat libovolný počet tvarů nebo žádný (multiplicita <code>0..*</code> na straně <code>Tvar</code>) a každý tvar může mít přiřazen nejvýše jeden styl nebo žádný (multiplicita <code>0..1</code> a role <code>styl</code> na straně <code>Styl</code>, odpovídající referenčnímu atributu <code>-styl: Styl</code> ve třídě <code>Tvar</code>).</p>
     `,
     requirements: [
       'Umístěte na plátno konkrétní třídy <strong>Tvar</strong> (včetně referenčního atributu <code>-styl: Styl</code>) a <strong>Styl</strong>.',
-      'Propojte je <strong>jednosměrnou řiditelnou asociací</strong> směřující z <code>Tvar</code> na <code>Styl</code> (otevřená šipka u <code>Styl</code>).',
+      'Propojte je <strong>asociací</strong> směřující z <code>Tvar</code> na <code>Styl</code> (šipka u <code>Styl</code>).',
       'Nastavte multiplicitu <code>0..*</code> na straně <code>Tvar</code> a multiplicitu <code>0..1</code> s rolí <code>styl</code> na straně <code>Styl</code>.'
     ],
     hints: [
@@ -1589,7 +1606,7 @@ const RAW_GEOMETRIE_SUBCHAPTERS = [
           targetMultiplicity: '0..1',
           targetRole: 'styl',
           feedback: {
-            wrongType: 'Mezi třídami Tvar a Styl použij jednosměrnou řiditelnou asociaci (otevřená šipka u Styl), nikoli obousměrnou asociaci (<-->).',
+            wrongType: 'Mezi třídami Tvar a Styl použij asociaci se šipkou u Styl, nikoli obousměrnou asociaci (<-->).',
             wrongDirection: 'Šipka řiditelnosti musí směřovat od Tvar (který drží referenční atribut styl) ke Styl.',
             wrongSourceMultiplicity: 'U vazby Tvar → Styl nastav na straně Tvar multiplicitu „0..*“ (jeden styl může používat nula až libovolný počet tvarů).',
             wrongTargetMultiplicity: 'U vazby Tvar → Styl nastav na straně Styl multiplicitu „0..1“ (tvar může mít přiřazen nejvýše jeden styl nebo žádný).',
@@ -1601,35 +1618,37 @@ const RAW_GEOMETRIE_SUBCHAPTERS = [
   },
 
   // --------------------------------------------------------------------------
-  // Krok 2 (2.2): Řiditelnost asociací, role a referenční atributy
+  // Krok 2 (4.2): Řiditelnost asociací, role a referenční atributy
   // --------------------------------------------------------------------------
   {
     id: 'p-geo-02',
     order: 2,
-    title: '2.2 Řiditelnost asociací, role a referenční atributy',
-    shortTitle: '2.2 Plátno a Kotevní bod',
-    storyIntro: 'Skvěle! Třída Tvar získala referenční atribut kotevniBod – teď na plátno doplníme pracovní Platno a souřadnicový Bod a propojíme je jednosměrnými řiditelnými asociacemi.',
+    title: '4.2 Řiditelnost asociací, role a referenční atributy',
+    shortTitle: '4.2 Plátno a Kotevní bod',
+    storyIntro: 'Skvěle! Třída Tvar automaticky získala referenční atribut kotevniBod – teď na plátno doplníme pracovní Platno a souřadnicový Bod a propojíme je řiditelnými asociacemi.',
     inheritPreviousCanvas: true,
     previousSubchapterId: 'p-geo-01',
     assignmentTitle: 'Geometrie 2/4: Řiditelnost asociací, role a referenční atributy',
     assignmentHtml: `
-      <p>Navazujte na svůj diagram z <strong>Podkapitoly 2.1</strong> a rozšiřte jej o pracovní plátno, kotevní bod tvarů a jednosměrně řiditelné asociace s rolemi navázanými na referenční atributy. Stávající třídy i vazbu <code>Tvar → Styl</code> zachovejte a proveďte přesně následující úpravy a doplnění:</p>
+      <p><strong>Rozšíření modelu a nové třídy v paletě:</strong> Navazujete na svůj diagram z <strong>Podkapitoly 4.1</strong> (třídy <code>Tvar</code> a <code>Styl</code> i jejich vazba zůstávají na plátně). Do stávající třídy <code>Tvar</code> se automaticky promítl soukromý referenční atribut (<code>-</code>) <code>kotevniBod: Bod</code>. V paletě přibyly dvě nové konkrétní třídy:</p>
       <ul>
-        <li><strong>Úprava stávající třídy Tvar:</strong> Doplňte soukromý referenční atribut (<code>-</code>) <code>kotevniBod</code> typu <code>Bod</code> <em>(aktualizace se automaticky promítla na kartě třídy na plátně)</em>.</li>
-        <li><strong>Nová konkrétní třída Platno</strong> (základní rozsah před zavedením vrstev): Přidejte třídu se soukromými atributy (<code>-</code>): <code>nazev</code> typu <code>String</code>, <code>sirkaPx</code> typu <code>int</code>, <code>vyskaPx</code> typu <code>int</code>, <code>barvaPozadi</code> typu <code>String</code> a referenčním atributem <code>oznacenyTvar</code> typu <code>Tvar</code>. Přidejte tři veřejné operace (<code>+</code>): <code>oznacTvar</code> s parametrem <code>tvar</code> typu <code>Tvar</code> vracející <code>void</code>, bezparametrickou operaci <code>zrusOznaceni</code> vracející <code>void</code> a bezparametrickou operaci <code>vykresli</code> vracející <code>void</code>.</li>
-        <li><strong>Nová konkrétní třída Bod:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>x</code> typu <code>double</code> a <code>y</code> typu <code>double</code>. Přidejte čtyři veřejné operace (<code>+</code>): <code>posunO</code> s parametry <code>dx</code> typu <code>double</code> a <code>dy</code> typu <code>double</code> vracející <code>void</code>, <code>vzdalenostOd</code> s parametrem <code>cilovyBod</code> typu <code>Bod</code> vracející <code>double</code>, bezparametrickou operaci <code>ziskejX</code> vracející <code>double</code> a bezparametrickou operaci <code>ziskejY</code> vracející <code>double</code>.</li>
-        <li><strong>Nová vazba Platno → Tvar:</strong> Vytvořte <strong>jednosměrnou řiditelnou asociaci</strong> směřující z <code>Platno</code> na <code>Tvar</code> (otevřená šipka u <code>Tvar</code>). Na straně <code>Platno</code> uveďte multiplicitu <code>0..1</code>, na straně <code>Tvar</code> uveďte multiplicitu <code>0..1</code> a roli <code>oznacenyTvar</code> (odpovídající atributu <code>-oznacenyTvar: Tvar</code>).</li>
-        <li><strong>Nová vazba Tvar → Bod:</strong> Vytvořte <strong>jednosměrnou řiditelnou asociaci</strong> (v tomto kroku zatím bez kosočtverce) směřující z <code>Tvar</code> na <code>Bod</code> (otevřená šipka u <code>Bod</code>). Na straně <code>Tvar</code> uveďte multiplicitu <code>1</code>, na straně <code>Bod</code> uveďte multiplicitu <code>1</code> a roli <code>kotevniBod</code> (odpovídající atributu <code>-kotevniBod: Bod</code>).</li>
+        <li><strong>Platno</strong> (základní rozsah před zavedením vrstev) obsahuje soukromé atributy (<code>-</code>) <code>nazev: String</code>, <code>sirkaPx: int</code>, <code>vyskaPx: int</code>, <code>barvaPozadi: String</code>, soukromý referenční atribut <code>oznacenyTvar: Tvar</code> a veřejné operace (<code>+</code>) <code>oznacTvar(tvar: Tvar): void</code>, <code>zrusOznaceni(): void</code> a <code>vykresli(): void</code>.</li>
+        <li><strong>Bod</strong> obsahuje soukromé atributy (<code>-</code>) <code>x: double</code> a <code>y: double</code> a veřejné operace (<code>+</code>) <code>posunO(dx: double, dy: double): void</code>, <code>vzdalenostOd(cilovyBod: Bod): double</code>, <code>ziskejX(): double</code> a <code>ziskejY(): double</code>.</li>
+      </ul>
+      <p><strong>Váš úkol na plátně:</strong> Zachovejte stávající třídy a vazbu <code>Tvar → Styl</code>, přidejte z palety třídy <code>Platno</code> a <code>Bod</code> a vytvořte dvě nové asociace:</p>
+      <ul>
+        <li><strong>Platno → Tvar:</strong> Vytvořte asociaci směřující z <code>Platno</code> na <code>Tvar</code> (šipka u <code>Tvar</code>) s multiplicitou <code>0..1</code> na straně <code>Platno</code> a multiplicitou <code>0..1</code> a rolí <code>oznacenyTvar</code> na straně <code>Tvar</code> (odpovídající referenčnímu atributu <code>-oznacenyTvar: Tvar</code>).</li>
+        <li><strong>Tvar → Bod:</strong> Vytvořte asociaci (v tomto kroku zatím bez kosočtverce) směřující z <code>Tvar</code> na <code>Bod</code> (šipka u <code>Bod</code>) s multiplicitou <code>1</code> na straně <code>Tvar</code> a multiplicitou <code>1</code> a rolí <code>kotevniBod</code> na straně <code>Bod</code> (odpovídající referenčnímu atributu <code>-kotevniBod: Bod</code>).</li>
       </ul>
     `,
     requirements: [
-      'Zachovejte stávající třídy <code>Tvar</code> (aktualizovaný o <code>-kotevniBod: Bod</code>), <code>Styl</code> i jejich jednosměrnou řiditelnou asociaci <code>Tvar (0..*)</code> → <code>Styl (0..1, role: styl)</code>.',
+      'Zachovejte stávající třídy <code>Tvar</code> (aktualizovaný o <code>-kotevniBod: Bod</code>), <code>Styl</code> i jejich asociaci <code>Tvar (0..*)</code> → <code>Styl (0..1, role: styl)</code>.',
       'Přidejte z palety nové třídy <strong>Platno</strong> (s referenčním atributem <code>-oznacenyTvar: Tvar</code>) a <strong>Bod</strong>.',
-      'Vytvořte jednosměrnou řiditelnou asociaci <code>Platno (0..1)</code> → <code>Tvar (0..1, role: oznacenyTvar)</code>.',
-      'Vytvořte jednosměrnou řiditelnou asociaci <code>Tvar (1)</code> → <code>Bod (1, role: kotevniBod)</code> (zatím bez kosočtverce).'
+      'Vytvořte asociaci <code>Platno (0..1)</code> → <code>Tvar (0..1, role: oznacenyTvar)</code>.',
+      'Vytvořte asociaci <code>Tvar (1)</code> → <code>Bod (1, role: kotevniBod)</code> (zatím bez kosočtverce).'
     ],
     hints: [
-      'V tomto kroku je vazba Tvar → Bod záměrně ještě jednosměrnou asociací bez kosočtverce; na kompozici ji změníme v dalším kroku. Cílové role oznacenyTvar a kotevniBod odpovídají referenčním atributům ve zdrojových třídách.'
+      'V tomto kroku (4.2) je vazba Tvar → Bod záměrně ještě asociací bez kosočtverce; na kompozici ji změníme v kroku 4.3. Cílové role oznacenyTvar a kotevniBod odpovídají referenčním atributům ve zdrojových třídách.'
     ],
     classes: [
       GEO_CLASS_PLATNO_BASE,
@@ -1668,7 +1687,7 @@ const RAW_GEOMETRIE_SUBCHAPTERS = [
           targetMultiplicity: '1',
           targetRole: 'kotevniBod',
           feedback: {
-            wrongType: 'V tomto kroku (2.2) modeluj vazbu Tvar → Bod zatím jako jednosměrnou řiditelnou asociaci bez kosočtverce.',
+            wrongType: 'V tomto kroku (4.2) modeluj vazbu Tvar → Bod zatím jako asociaci bez kosočtverce.',
             wrongTargetRole: 'U vazby Tvar → Bod doplň na straně Bod roli „kotevniBod“ odpovídající referenčnímu atributu -kotevniBod: Bod.'
           }
         },
@@ -1688,39 +1707,41 @@ const RAW_GEOMETRIE_SUBCHAPTERS = [
   },
 
   // --------------------------------------------------------------------------
-  // Krok 3 (2.3): Vazby celek–část (agregace a kompozice)
+  // Krok 3 (4.3): Vazby celek–část (agregace a kompozice)
   // --------------------------------------------------------------------------
   {
     id: 'p-geo-03',
     order: 3,
-    title: '2.3 Vazby celek–část (agregace a kompozice)',
-    shortTitle: '2.3 Vrstvy, Paleta a kompozice',
+    title: '4.3 Vazby celek–část (agregace a kompozice)',
+    shortTitle: '4.3 Vrstvy, Paleta a kompozice',
     storyIntro: 'Třída Platno automaticky získala referenční atribut vrstvy i operace pro správu vrstev. Teď model obohať o Vrstvu, Paletu, silné kompozice (včetně zpřesnění vazby k Bodu) a slabou agregaci palety stylů.',
     inheritPreviousCanvas: true,
     previousSubchapterId: 'p-geo-02',
     assignmentTitle: 'Geometrie 3/4: Vazby celek–část (agregace a kompozice)',
     assignmentHtml: `
-      <p>Navazujte na svůj diagram z <strong>Podkapitoly 2.2</strong> a rozšiřte jej o vrstvy plátna, tematické palety stylů a vazby typu celek–část (agregace a kompozice). Všechny dosavadní prvky z předchozího kroku zachovejte a proveďte přesně následující změny (cílová role každé vazby ukazuje na odpovídající referenční atribut ve zdrojové třídě):</p>
+      <p><strong>Rozšíření modelu a nové třídy v paletě:</strong> Navazujete na svůj diagram z <strong>Podkapitoly 4.2</strong>. Do stávající třídy <code>Platno</code> se automaticky promítl soukromý referenční atribut (<code>-</code>) <code>vrstvy: List&lt;Vrstva&gt;</code> a veřejné operace <code>pridejVrstvu(vrstva: Vrstva): void</code> a <code>odeberVrstvu(vrstvaId: String): boolean</code>. V paletě jsou nově připraveny dvě konkrétní třídy:</p>
       <ul>
-        <li><strong>Úprava stávající třídy Platno:</strong> Doplňte soukromý referenční atribut (<code>-</code>) <code>vrstvy</code> typu <code>List&lt;Vrstva&gt;</code> a dvě veřejné operace (<code>+</code>) pro správu vrstev: <code>pridejVrstvu</code> s parametrem <code>vrstva</code> typu <code>Vrstva</code> vracející <code>void</code> a <code>odeberVrstvu</code> s parametrem <code>vrstvaId</code> typu <code>String</code> vracející <code>boolean</code> <em>(aktualizace se automaticky promítla na kartě třídy na plátně)</em>.</li>
-        <li><strong>Nová konkrétní třída Vrstva:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>vrstvaId</code> typu <code>String</code>, <code>nazev</code> typu <code>String</code>, <code>poradiZ</code> typu <code>int</code>, <code>viditelna</code> typu <code>boolean</code>, <code>zamcena</code> typu <code>boolean</code> a referenčním atributem <code>tvary</code> typu <code>List&lt;Tvar&gt;</code>. Přidejte pět veřejných operací (<code>+</code>): <code>pridejTvar</code> s parametrem <code>tvar</code> typu <code>Tvar</code> vracející <code>boolean</code>, <code>odeberTvar</code> s parametrem <code>tvarId</code> typu <code>String</code> vracející <code>boolean</code>, <code>najdiTvar</code> s parametrem <code>tvarId</code> typu <code>String</code> vracející <code>Tvar</code>, <code>nastavViditelnost</code> s parametrem <code>viditelna</code> typu <code>boolean</code> vracející <code>void</code> a bezparametrickou operaci <code>ziskejPocetTvaru</code> vracející <code>int</code>.</li>
-        <li><strong>Nová konkrétní třída Paleta:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>nazev</code> typu <code>String</code>, <code>popis</code> typu <code>String</code> a referenčním atributem <code>styly</code> typu <code>List&lt;Styl&gt;</code>. Přidejte čtyři veřejné operace (<code>+</code>): <code>pridejStyl</code> s parametrem <code>styl</code> typu <code>Styl</code> vracející <code>void</code>, <code>odeberStyl</code> s parametrem <code>stylId</code> typu <code>String</code> vracející <code>boolean</code>, <code>najdiStyl</code> s parametrem <code>stylId</code> typu <code>String</code> vracející <code>Styl</code> a bezparametrickou operaci <code>ziskejPocetStylu</code> vracející <code>int</code>.</li>
-        <li><strong>Nová kompozice Platno ◆→ Vrstva:</strong> Vrstva je existenčně závislou součástí plátna a při jeho odstranění zaniká. Vytvořte <strong>jednosměrnou řiditelnou kompozici</strong> z celku <code>Platno</code> (plný kosočtverec u <code>Platno</code>) k části <code>Vrstva</code> (šipka u <code>Vrstva</code>). Na straně <code>Platno</code> uveďte multiplicitu <code>1</code>, na straně <code>Vrstva</code> uveďte multiplicitu <code>1..*</code> a roli <code>vrstvy</code> (odpovídající atributu <code>-vrstvy: List&lt;Vrstva&gt;</code>).</li>
-        <li><strong>Nová kompozice Vrstva ◆→ Tvar:</strong> Nakreslené tvary jsou existenčně svázány se svou vrstvou a při jejím smazání zanikají. Vytvořte <strong>jednosměrnou řiditelnou kompozici</strong> z celku <code>Vrstva</code> (plný kosočtverec u <code>Vrstva</code>) k části <code>Tvar</code> (šipka u <code>Tvar</code>). Na straně <code>Vrstva</code> uveďte multiplicitu <code>1</code>, na straně <code>Tvar</code> uveďte multiplicitu <code>0..*</code> a roli <code>tvary</code> (odpovídající atributu <code>-tvary: List&lt;Tvar&gt;</code>).</li>
-        <li><strong>Zpřesnění stávající vazby Tvar → Bod:</strong> Kotevní bod je neoddělitelnou součástí tvaru a zaniká společně s ním. Změňte typ této stávající jednosměrné asociace na <strong>jednosměrnou řiditelnou kompozici</strong> (doplňte plný kosočtverec na stranu <code>Tvar</code>); směr šipky k <code>Bod</code>, multiplicity (<code>1</code> a <code>1</code>) i roli <code>kotevniBod</code> ponechte beze změny.</li>
-        <li><strong>Nová agregace Paleta ◇→ Styl:</strong> Paleta sdružuje styly s nezávislým životním cyklem (při smazání palety styly v systému nadále existují). Vytvořte <strong>jednosměrnou řiditelnou agregaci</strong> z celku <code>Paleta</code> (prázdný kosočtverec u <code>Paleta</code>) k části <code>Styl</code> (šipka u <code>Styl</code>). Na straně <code>Paleta</code> uveďte multiplicitu <code>0..1</code>, na straně <code>Styl</code> uveďte multiplicitu <code>0..*</code> a roli <code>styly</code> (odpovídající atributu <code>-styly: List&lt;Styl&gt;</code>).</li>
+        <li><strong>Vrstva</strong> obsahuje soukromé atributy (<code>-</code>) <code>vrstvaId: String</code>, <code>nazev: String</code>, <code>poradiZ: int</code>, <code>viditelna: boolean</code>, <code>zamcena: boolean</code>, soukromý referenční atribut <code>tvary: List&lt;Tvar&gt;</code> a veřejné operace (<code>+</code>) <code>pridejTvar(tvar: Tvar): boolean</code>, <code>odeberTvar(tvarId: String): boolean</code>, <code>najdiTvar(tvarId: String): Tvar</code>, <code>nastavViditelnost(viditelna: boolean): void</code> a <code>ziskejPocetTvaru(): int</code>.</li>
+        <li><strong>Paleta</strong> obsahuje soukromé atributy (<code>-</code>) <code>nazev: String</code>, <code>popis: String</code>, soukromý referenční atribut <code>styly: List&lt;Styl&gt;</code> a veřejné operace (<code>+</code>) <code>pridejStyl(styl: Styl): void</code>, <code>odeberStyl(stylId: String): boolean</code>, <code>najdiStyl(stylId: String): Styl</code> a <code>ziskejPocetStylu(): int</code>.</li>
+      </ul>
+      <p><strong>Váš úkol na plátně:</strong> Zachovejte všechny dosavadní třídy a vazby z kroku 4.2, přidejte z palety třídy <code>Vrstva</code> a <code>Paleta</code> a vytvořte či upravte následující vazby typu celek–část:</p>
+      <ul>
+        <li><strong>Kompozice Platno ◆→ Vrstva:</strong> Vrstva je existenčně závislou součástí plátna a při jeho odstranění zaniká. Vytvořte <strong>kompozici</strong> z celku <code>Platno</code> (plný kosočtverec u <code>Platno</code>) k části <code>Vrstva</code> (šipka u <code>Vrstva</code>) s multiplicitou <code>1</code> na straně <code>Platno</code> a multiplicitou <code>1..*</code> a rolí <code>vrstvy</code> na straně <code>Vrstva</code> (odpovídající atributu <code>-vrstvy: List&lt;Vrstva&gt;</code>).</li>
+        <li><strong>Kompozice Vrstva ◆→ Tvar:</strong> Nakreslené tvary jsou existenčně svázány se svou vrstvou a při jejím smazání zanikají. Vytvořte <strong>kompozici</strong> z celku <code>Vrstva</code> (plný kosočtverec u <code>Vrstva</code>) k části <code>Tvar</code> (šipka u <code>Tvar</code>) s multiplicitou <code>1</code> na straně <code>Vrstva</code> a multiplicitou <code>0..*</code> a rolí <code>tvary</code> na straně <code>Tvar</code> (odpovídající atributu <code>-tvary: List&lt;Tvar&gt;</code>).</li>
+        <li><strong>Zpřesnění stávající vazby Tvar → Bod:</strong> Kotevní bod je neoddělitelnou součástí tvaru a zaniká společně s ním. Klikněte na tuto stávající vazbu a změňte její typ z asociace na <strong>kompozici</strong> (plný kosočtverec na straně <code>Tvar</code>); směr šipky k <code>Bod</code>, multiplicity (<code>1</code> a <code>1</code>) i roli <code>kotevniBod</code> ponechte beze změny.</li>
+        <li><strong>Agregace Paleta ◇→ Styl:</strong> Paleta sdružuje styly s nezávislým životním cyklem (při smazání palety styly v systému nadále existují). Vytvořte <strong>agregaci</strong> z celku <code>Paleta</code> (prázdný kosočtverec u <code>Paleta</code>) k části <code>Styl</code> (šipka u <code>Styl</code>) s multiplicitou <code>0..1</code> na straně <code>Paleta</code> a multiplicitou <code>0..*</code> a rolí <code>styly</code> na straně <code>Styl</code> (odpovídající atributu <code>-styly: List&lt;Styl&gt;</code>).</li>
       </ul>
     `,
     requirements: [
-      'Zachovejte stávající 4 třídy i vazby <code>Platno → Tvar</code> a <code>Tvar → Styl</code>.',
+      'Zachovejte stávající 4 třídy z kroku 4.2 i vazby <code>Platno → Tvar</code> a <code>Tvar → Styl</code>.',
       'Přidejte z palety nové třídy <strong>Vrstva</strong> (s referenčním atributem <code>-tvary: List&lt;Tvar&gt;</code>) a <strong>Paleta</strong> (s referenčním atributem <code>-styly: List&lt;Styl&gt;</code>).',
-      'Vytvořte jednosměrnou řiditelnou <strong>kompozici</strong> <code>Platno (1)</code> ◆→ <code>Vrstva (1..*, role: vrstvy)</code>.',
-      'Vytvořte jednosměrnou řiditelnou <strong>kompozici</strong> <code>Vrstva (1)</code> ◆→ <code>Tvar (0..*, role: tvary)</code>.',
-      'Klikněte na stávající vazbu <code>Tvar → Bod</code> a přepněte ji na jednosměrnou řiditelnou <strong>kompozici</strong> (plný kosočtverec u <code>Tvar</code>).',
-      'Vytvořte jednosměrnou řiditelnou <strong>agregaci</strong> <code>Paleta (0..1)</code> ◇→ <code>Styl (0..*, role: styly)</code>.'
+      'Vytvořte <strong>kompozici</strong> <code>Platno (1)</code> ◆→ <code>Vrstva (1..*, role: vrstvy)</code>.',
+      'Vytvořte <strong>kompozici</strong> <code>Vrstva (1)</code> ◆→ <code>Tvar (0..*, role: tvary)</code>.',
+      'Klikněte na stávající vazbu <code>Tvar → Bod</code> a přepněte ji na <strong>kompozici</strong> (plný kosočtverec u <code>Tvar</code>).',
+      'Vytvořte <strong>agregaci</strong> <code>Paleta (0..1)</code> ◇→ <code>Styl (0..*, role: styly)</code>.'
     ],
     hints: [
-      'Nezapomeňte upravit existující vazbu Tvar → Bod na kompozici (◆──>) a ponechat původní vazbu Platno → Tvar (role oznacenyTvar) jako jednosměrnou řiditelnou asociaci.'
+      'Nezapomeňte upravit existující vazbu Tvar → Bod na kompozici (◆──>) a ponechat původní vazbu Platno → Tvar (role oznacenyTvar) jako asociaci.'
     ],
     classes: [
       GEO_CLASS_PLATNO_FULL,
@@ -1752,7 +1773,7 @@ const RAW_GEOMETRIE_SUBCHAPTERS = [
           targetMultiplicity: '1..*',
           targetRole: 'vrstvy',
           feedback: {
-            wrongType: 'Vrstva nemůže existovat bez plátna – mezi Platno a Vrstva použij jednosměrnou řiditelnou kompozici (plný kosočtverec u Platno).',
+            wrongType: 'Vrstva nemůže existovat bez plátna – mezi Platno a Vrstva použij kompozici (plný kosočtverec u Platno).',
             wrongSourceMultiplicity: 'U kompozice Platno ◆→ Vrstva musí být na straně celku (Platno) multiplicita „1“.',
             wrongTargetMultiplicity: 'Každé plátno musí obsahovat alespoň jednu vrstvu – na straně Vrstva uveď multiplicitu „1..*“.',
             wrongTargetRole: 'U kompozice Platno ◆→ Vrstva uveď na straně Vrstva roli „vrstvy“ odpovídající referenčnímu atributu -vrstvy: List<Vrstva>.'
@@ -1769,7 +1790,7 @@ const RAW_GEOMETRIE_SUBCHAPTERS = [
           targetMultiplicity: '0..*',
           targetRole: 'tvary',
           feedback: {
-            wrongType: 'Tvary jsou existenčně svázány se svou vrstvou – mezi Vrstva a Tvar použij jednosměrnou řiditelnou kompozici (plný kosočtverec u Vrstva).',
+            wrongType: 'Tvary jsou existenčně svázány se svou vrstvou – mezi Vrstva a Tvar použij kompozici (plný kosočtverec u Vrstva).',
             wrongSourceMultiplicity: 'U kompozice Vrstva ◆→ Tvar musí být na straně celku (Vrstva) multiplicita „1“.',
             wrongTargetRole: 'U kompozice Vrstva ◆→ Tvar uveď na straně Tvar roli „tvary“ odpovídající referenčnímu atributu -tvary: List<Tvar>.'
           }
@@ -1796,7 +1817,7 @@ const RAW_GEOMETRIE_SUBCHAPTERS = [
           targetMultiplicity: '1',
           targetRole: 'kotevniBod',
           feedback: {
-            wrongType: 'Stávající vazbu Tvar → Bod je v tomto kroku nutné zpřesnit z jednosměrné asociace na jednosměrnou řiditelnou kompozici (plný kosočtverec u Tvar).',
+            wrongType: 'Stávající vazbu Tvar → Bod je v kroku 4.3 nutné zpřesnit z asociace na kompozici (plný kosočtverec u Tvar).',
             wrongTargetRole: 'U kompozice Tvar ◆→ Bod ponech na straně Bod roli „kotevniBod“ odpovídající referenčnímu atributu -kotevniBod: Bod.'
           }
         },
@@ -1822,7 +1843,7 @@ const RAW_GEOMETRIE_SUBCHAPTERS = [
           targetMultiplicity: '0..*',
           targetRole: 'styly',
           feedback: {
-            wrongType: 'Při smazání palety styly nadále existují (nezávislý životní cyklus) – mezi Paleta a Styl použij jednosměrnou řiditelnou agregaci (prázdný kosočtverec u Paleta).',
+            wrongType: 'Při smazání palety styly nadále existují (nezávislý životní cyklus) – mezi Paleta a Styl použij agregaci (prázdný kosočtverec u Paleta).',
             wrongSourceMultiplicity: 'U agregace Paleta ◇→ Styl uveď na straně Paleta multiplicitu „0..1“ (styl může existovat i mimo paletu).',
             wrongTargetRole: 'U agregace Paleta ◇→ Styl uveď na straně Styl roli „styly“ odpovídající referenčnímu atributu -styly: List<Styl>.'
           }
@@ -1832,28 +1853,27 @@ const RAW_GEOMETRIE_SUBCHAPTERS = [
   },
 
   // --------------------------------------------------------------------------
-  // Krok 4 (2.4): Generalizace, abstraktní třída a finální podoba diagramu
+  // Krok 4 (4.4): Generalizace, abstraktní třída a finální podoba diagramu
   // --------------------------------------------------------------------------
   {
     id: 'p-geo-04',
     order: 4,
-    title: '2.4 Generalizace, abstraktní třída a finální podoba diagramu',
-    shortTitle: '2.4 Abstraktní Tvar a podtřídy',
-    storyIntro: 'Závěrečný tah štětcem! Třída Tvar se proměnila v abstraktní nadtřídu s chráněnými členy (#) a abstraktními metodami – napoj k ní konkrétní tvary Kruh a Obdelnik.',
+    title: '4.4 Generalizace, abstraktní třída a finální podoba diagramu',
+    shortTitle: '4.4 Abstraktní Tvar a podtřídy',
+    storyIntro: 'Závěrečný tah štětcem! Třída Tvar se automaticky proměnila v abstraktní nadtřídu s chráněnými členy (#) a abstraktními metodami – napoj k ní konkrétní tvary Kruh a Obdelnik.',
     inheritPreviousCanvas: true,
     previousSubchapterId: 'p-geo-03',
     assignmentTitle: 'Geometrie 4/4: Generalizace, abstraktní třída a finální podoba diagramu',
     assignmentHtml: `
-      <p>Navazujte na svůj diagram z <strong>Podkapitoly 2.3</strong> a dokončete jej do finální celistvé podoby převedením třídy <code>Tvar</code> na abstraktní nadtřídu a doplněním konkrétních geometrických specializací. Všechny ostatní dosavadní třídy, referenční atributy a vazby zachovejte beze změny a proveďte přesně tyto úpravy:</p>
+      <p><strong>Refaktoring modelu a nové podtřídy v paletě:</strong> Navazujete na svůj diagram z <strong>Podkapitoly 4.3</strong>. Třída <code>Tvar</code> na plátně byla automaticky převedena na <strong>abstraktní nadtřídu</strong> (<code>abstract</code>): atributy <code>rotaceStupne</code> a <code>viditelny</code> i pomocná operace <code>normalizujUhel</code> získaly chráněnou viditelnost (<code>#</code>) pro potomky a bezparametrické operace <code>+vypoctiObsah(): double</code>, <code>+vypoctiObvod(): double</code> a <code>+vykresli(): void</code> jsou nyní abstraktní (<code>{abstract}</code>). V paletě jsou nově připraveny dvě konkrétní geometrické specializace:</p>
       <ul>
-        <li><strong>Refaktoring třídy Tvar:</strong> Změňte třídu <code>Tvar</code> na <strong>abstraktní třídu</strong> (<code>abstract</code>). Změňte viditelnost atributů <code>rotaceStupne</code> (<code>double</code>) a <code>viditelny</code> (<code>boolean</code>) ze soukromé (<code>-</code>) na chráněnou (<code>#</code>) (atribut <code>tvarId</code> a referenční atributy <code>styl</code> a <code>kotevniBod</code> zůstávají soukromé <code>-</code>). Označte tři bezparametrické veřejné operace <code>+vypoctiObsah(): double</code>, <code>+vypoctiObvod(): double</code> a <code>+vykresli(): void</code> jako abstraktní (<code>{abstract}</code>). Změňte viditelnost pomocné operace <code>normalizujUhel(uhel: double): double</code> ze soukromé (<code>-</code>) na chráněnou (<code>#</code>) <em>(refaktoring třídy se automaticky projevil na tvém plátně)</em>.</li>
-        <li><strong>Nová konkrétní podtřída Kruh:</strong> Přidejte třídu se soukromým atributem (<code>-</code>) <code>polomer</code> typu <code>double</code>. Přidejte pět veřejných operací (<code>+</code>): bezparametrické operace <code>vypoctiObsah</code> vracející <code>double</code>, <code>vypoctiObvod</code> vracející <code>double</code> a <code>vykresli</code> vracející <code>void</code>, dále operaci <code>zmenPolomer</code> s parametrem <code>novyPolomer</code> typu <code>double</code> vracející <code>boolean</code> a operaci <code>obsahujeBod</code> s parametrem <code>bod</code> typu <code>Bod</code> vracející <code>boolean</code>.</li>
-        <li><strong>Nová konkrétní podtřída Obdelnik:</strong> Přidejte třídu se soukromými atributy (<code>-</code>): <code>sirka</code> typu <code>double</code>, <code>vyska</code> typu <code>double</code> a <code>zaobleniRohu</code> typu <code>double</code>. Přidejte pět veřejných operací (<code>+</code>): bezparametrické operace <code>vypoctiObsah</code> vracející <code>double</code>, <code>vypoctiObvod</code> vracející <code>double</code>, <code>vykresli</code> vracející <code>void</code> a <code>jeCtverec</code> vracející <code>boolean</code>, a dále operaci <code>zmenRozmery</code> s parametry <code>novaSirka</code> typu <code>double</code> a <code>novaVyska</code> typu <code>double</code> vracející <code>boolean</code>. Přidejte také jednu soukromou pomocnou operaci (<code>-</code>) <code>overRozmery</code> s parametry <code>sirka</code> typu <code>double</code> a <code>vyska</code> typu <code>double</code> vracející <code>boolean</code>.</li>
-        <li><strong>Nové vazby generalizace:</strong> Napojte obě nové podtřídy na abstraktní nadtřídu <code>Tvar</code> pomocí <strong>dvou vazeb generalizace</strong> (plná čára s prázdnou trojúhelníkovou šipkou směřující k <code>Tvar</code>): <code>Kruh</code> dědí z <code>Tvar</code> a <code>Obdelnik</code> dědí z <code>Tvar</code>.</li>
+        <li><strong>Kruh</strong> obsahuje soukromý atribut (<code>-</code>) <code>polomer: double</code> a veřejné operace (<code>+</code>) <code>vypoctiObsah(): double</code>, <code>vypoctiObvod(): double</code>, <code>vykresli(): void</code>, <code>zmenPolomer(novyPolomer: double): boolean</code> a <code>obsahujeBod(bod: Bod): boolean</code>.</li>
+        <li><strong>Obdelnik</strong> obsahuje soukromé atributy (<code>-</code>) <code>sirka: double</code>, <code>vyska: double</code> a <code>zaobleniRohu: double</code>, veřejné operace (<code>+</code>) <code>vypoctiObsah(): double</code>, <code>vypoctiObvod(): double</code>, <code>vykresli(): void</code>, <code>zmenRozmery(novaSirka: double, novaVyska: double): boolean</code> a <code>jeCtverec(): boolean</code> a soukromou pomocnou operaci (<code>-</code>) <code>overRozmery(sirka: double, vyska: double): boolean</code>.</li>
       </ul>
+      <p><strong>Váš úkol na plátně:</strong> Zachovejte všech 6 dosavadních tříd a všech 6 vazeb z kroku 4.3, přidejte z palety konkrétní podtřídy <code>Kruh</code> a <code>Obdelnik</code> a napojte je na abstraktní nadtřídu <code>Tvar</code> pomocí <strong>dvou vazeb generalizace</strong> (plná čára s prázdným trojúhelníkem směřujícím k <code>Tvar</code>, bez multiplicit a rolí): <code>Kruh</code> dědí z <code>Tvar</code> a <code>Obdelnik</code> dědí z <code>Tvar</code>.</p>
     `,
     requirements: [
-      'Zachovejte všech 6 dosavadních tříd (včetně aktualizované abstraktní třídy <code>Tvar</code>) a všech 6 vazeb z kroku 2.3.',
+      'Zachovejte všech 6 dosavadních tříd (včetně aktualizované abstraktní třídy <code>Tvar</code>) a všech 6 vazeb z kroku 4.3.',
       'Přidejte z palety konkrétní podtřídy <strong>Kruh</strong> a <strong>Obdelnik</strong>.',
       'Vytvořte vazbu <strong>generalizace</strong> od <code>Kruh</code> (potomek) k <code>Tvar</code> (rodič) bez multiplicit a rolí.',
       'Vytvořte vazbu <strong>generalizace</strong> od <code>Obdelnik</code> (potomek) k <code>Tvar</code> (rodič) bez multiplicit a rolí.'
