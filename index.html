@@ -189,8 +189,8 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="input-onboarding-name">Jak tě mám oslovovat? (volitelné – přezdívka nebo školní ID pro certifikát):</label>
-          <input type="text" id="input-onboarding-name" class="input" placeholder="např. novakj01 nebo Jana">
+          <label for="input-onboarding-name">Zadej své školní uživatelské jméno nebo celé jméno (doporučeno pro odevzdání certifikátu v Moodlu):</label>
+          <input type="text" id="input-onboarding-name" class="input" placeholder="např. novakj01 nebo Jan Novák">
         </div>
       </div>
       <div class="modal-footer">
@@ -244,9 +244,11 @@
         <div class="form-group">
           <label for="input-student-id">Jméno / identifikátor učedníka (pro certifikát a odevzdání):</label>
           <div class="inline-form">
-            <input type="text" id="input-student-id" class="input" placeholder="např. novakj01">
+            <input type="text" id="input-student-id" class="input" placeholder="např. novakj01 nebo Jan Novák">
             <button type="button" id="btn-save-student-id" class="btn btn-sm btn-secondary">Uložit</button>
           </div>
+          <small id="cert-session-note" style="display:block;margin-top:0.35rem;color:#64748b;"></small>
+          <small id="student-id-lock-note" style="display:block;margin-top:0.2rem;color:#b45309;" hidden></small>
         </div>
 
         <div class="form-group">
