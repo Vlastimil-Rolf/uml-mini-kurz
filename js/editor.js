@@ -20,7 +20,7 @@ const RELATION_PRESETS = [
     key: 'association_uni',
     type: 'association',
     navigability: 'unidirectional',
-    label: 'Jednosměrná asociace (řiditelná)',
+    label: 'Asociace (řiditelná)',
     symbol: '──>',
     allowMultiplicity: true,
     allowSourceRole: false,
@@ -30,7 +30,7 @@ const RELATION_PRESETS = [
     key: 'aggregation_uni',
     type: 'aggregation',
     navigability: 'unidirectional',
-    label: 'Agregace (jednosměrná řiditelná)',
+    label: 'Agregace',
     symbol: '◇──>',
     allowMultiplicity: true,
     allowSourceRole: false,
@@ -40,7 +40,7 @@ const RELATION_PRESETS = [
     key: 'composition_uni',
     type: 'composition',
     navigability: 'unidirectional',
-    label: 'Kompozice (jednosměrná řiditelná)',
+    label: 'Kompozice',
     symbol: '◆──>',
     allowMultiplicity: true,
     allowSourceRole: false,
@@ -70,7 +70,7 @@ const RELATION_PRESETS = [
     key: 'association_bi',
     type: 'association',
     navigability: 'bidirectional',
-    label: 'Obousměrná asociace (oboustranně řiditelná)',
+    label: 'Obousměrná asociace',
     symbol: '<──>',
     allowMultiplicity: true,
     allowSourceRole: true,
@@ -1388,16 +1388,16 @@ export class UmlCanvasEditor {
 
       let rolesSectionHtml = '';
       if (activePreset.allowTargetRole && !activePreset.allowSourceRole) {
-        // Jednosměrně řiditelná vazba (asociace, agregace, kompozice): zobrazit a zvýraznit pouze Roli u cíle
+        // Řiditelná vazba směrem k cíli (asociace, agregace, kompozice): zobrazit a zvýraznit pouze Roli u cíle
         rolesSectionHtml = `
           <div class="form-group role-target-highlight">
             <label for="rel-input-tgt-role">Role u cíle (${escapeHtml(tgtName)}) — odpovídá názvu referenčního atributu ve třídě ${escapeHtml(srcName)}:</label>
             <input type="text" id="rel-input-tgt-role" class="input" value="${escapeHtml(draft.targetRole)}" placeholder="např. vozidla, polozky, styl">
-            <span class="role-field-hint">U jednosměrné řiditelnosti se role uvádí pouze na cílové straně (u otevřené šipky).</span>
+            <span class="role-field-hint">U řiditelné vazby se role uvádí pouze na cílové straně (u šipky).</span>
           </div>
         `;
       } else if (activePreset.allowSourceRole && activePreset.allowTargetRole) {
-        // Obousměrně řiditelná asociace (<──>): obě role
+        // Obousměrná asociace (<──>): obě role
         rolesSectionHtml = `
           <div class="relation-row-2col">
             <div class="form-group">
@@ -1428,7 +1428,7 @@ export class UmlCanvasEditor {
         </div>
 
         <div class="form-group">
-          <label>Typ vazby a řiditelnost podle UML 2.5:</label>
+          <label>Typ vazby podle UML 2.5:</label>
           <div class="relation-type-grid">${presetCardsHtml}</div>
         </div>
 
