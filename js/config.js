@@ -8,6 +8,7 @@ export const APP_CONFIG = {
   storageKey: 'uml_minikurz_state_v1',
   telemetryQueueKey: 'uml_minikurz_telemetry_queue_v1',
   integritySecret: 'UML25-CECH-MISTRA-INTEGRITY-KEY-2026#9f4a',
+  allowStudentRename: true,  // Nastavením na false lze po prvním zadání jména zakázat přejmenování
   chapterMasteryMinStars: 2, // Minimum 2 hvězdy (>= 80 XP) v každé podkapitole pro splnění kapitoly
   chapterMasteryMinXp: 80,
   maxLevel: 4,               // Nejvyšší dosažitelná úroveň (1500 XP)
